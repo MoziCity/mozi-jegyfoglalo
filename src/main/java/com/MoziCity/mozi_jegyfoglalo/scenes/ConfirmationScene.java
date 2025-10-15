@@ -1,6 +1,5 @@
 package com.MoziCity.mozi_jegyfoglalo.scenes;
 
-
 import com.MoziCity.mozi_jegyfoglalo.MainApp;
 import com.MoziCity.mozi_jegyfoglalo.model.Movie;
 import com.MoziCity.mozi_jegyfoglalo.model.Seat;
