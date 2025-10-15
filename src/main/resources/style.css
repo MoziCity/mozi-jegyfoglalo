@@ -4,6 +4,11 @@
     -fx-font-family: "Segoe UI", Arial, sans-serif;
 }
 
+.header {
+    -fx-background-color: #2c2c2c;
+    -fx-padding: 10px;
+}
+
 .label {
     -fx-text-fill: #e0e0e0;
 }
@@ -86,4 +91,12 @@
 .legend-label {
     -fx-text-fill: #e0e0e0;
     -fx-font-size: 14px;
+}
+
+/* Megerősítő képernyő stílusai */
+.confirmation-box {
+    -fx-background-color: #2c2c2c;
+    -fx-background-radius: 5px;
+    -fx-padding: 15px;
+    -fx-spacing: 10px;
 }
