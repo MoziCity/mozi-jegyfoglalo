@@ -17,7 +17,6 @@ public class Movie {
         this.price = price;
     }
 
-    // Getterek
     public String getTitle() { return title; }
     public String getImageUrl() { return imageUrl; }
     public String getDescription() { return description; }
