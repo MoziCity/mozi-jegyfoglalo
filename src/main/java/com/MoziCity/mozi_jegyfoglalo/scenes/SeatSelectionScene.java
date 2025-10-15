@@ -4,6 +4,7 @@ import com.MoziCity.mozi_jegyfoglalo.MainApp;
 import com.MoziCity.mozi_jegyfoglalo.model.Movie;
 import com.MoziCity.mozi_jegyfoglalo.model.Seat;
 import com.MoziCity.mozi_jegyfoglalo.model.SeatStatus;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -20,6 +21,7 @@ import javafx.scene.text.FontWeight;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
 
 public class SeatSelectionScene extends Scene {
 
@@ -63,7 +65,7 @@ public class SeatSelectionScene extends Scene {
 
         // Gomb engedélyezése/letiltása a kiválasztott ülések alapján
         BooleanProperty hasSelection = new SimpleBooleanProperty(false);
-        hasSelection.bind(Bindings.createBooleanBinding(() -> !selectedSeats.isEmpty(), selectedSeats));
+        hasSelection.bind(Bindings.createBooleanBinding((Callable<Boolean>) () -> !selectedSeats.isEmpty(), (Observable) selectedSeats));
         continueButton.disableProperty().bind(hasSelection.not());
 
         continueButton.setOnAction(e -> mainApp.showConfirmationScene(movie, new ArrayList<>(selectedSeats)));
