@@ -34,11 +34,11 @@ public class MovieSelectionController {
         // Ide jönne a filmek betöltése adatbázisból vagy szolgáltatásból
         // Most csak példa adatokkal dolgozunk
         movies = List.of(
-                new Movie("Dűne", "https://example.com/dune.jpg", "Egy sci-fi kaland a sivatag bolygón",
+                new Movie("Borat", "/images/film1.jpg", "A Borat: Kazah nép nagy fehér gyermeke Amerikába megy.",
                         java.time.LocalDateTime.now().plusDays(1).withHour(18).withMinute(0), 2500),
-                new Movie("Azték harcos", "https://example.com/aztec.jpg", "Történelmi kalandfilm",
+                new Movie("K-pop démonvadászok", "/images/film2.jpg", "A K-pop démonvadászok 2025-ben bemutatott amerikai animációs film.",
                         java.time.LocalDateTime.now().plusDays(1).withHour(20).withMinute(30), 2200),
-                new Movie("Sötét víz", "https://example.com/darkwater.jpg", "Thriller a mélyből",
+                new Movie("Barbie", "/images/film3.jpg", "A Barbie 2023-ban bemutatott amerikai fantasy filmvígjáték.",
                         java.time.LocalDateTime.now().plusDays(2).withHour(19).withMinute(0), 2400)
         );
 

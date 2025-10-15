@@ -27,6 +27,11 @@ public class MainApp extends Application {
         // Fő ablak beállítása
         primaryStage.setTitle(APP_TITLE);
         primaryStage.setResizable(false);
+
+        // Ablak méretének beállítása
+        primaryStage.setWidth(900);  // Ablak szélessége pixelben
+        primaryStage.setHeight(700); // Ablak magassága pixelben
+
         primaryStage.centerOnScreen();
 
         // Bezárás kezelése megerősítéssel
