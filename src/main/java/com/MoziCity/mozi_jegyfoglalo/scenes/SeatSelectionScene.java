@@ -1,9 +1,9 @@
 package com.MoziCity.mozi_jegyfoglalo.scenes;
 
-import com.example.cinema.MainApp;
-import com.example.cinema.model.Movie;
-import com.example.cinema.model.Seat;
-import com.example.cinema.model.SeatStatus;
+import com.MoziCity.mozi_jegyfoglalo.MainApp;
+import com.MoziCity.mozi_jegyfoglalo.model.Movie;
+import com.MoziCity.mozi_jegyfoglalo.model.Seat;
+import com.MoziCity.mozi_jegyfoglalo.model.SeatStatus;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
