@@ -1,9 +1,8 @@
 package com.MoziCity.mozi_jegyfoglalo;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@com.MoziCity.mozi_jegyfoglalo.SpringBootTest
 class MoziJegyfoglaloApplicationTests {
 
 	@Test
