@@ -83,8 +83,8 @@ public class MovieSelectionScene extends Scene {
 
     private List<Movie> createDummyMovies() {
         List<Movie> movies = new ArrayList<>();
-        movies.add(new Movie("Dűne", "/images/film1.jpg", "Egy fiatal nemes útja egy veszélyes bolygóra, hogy megvédje családját és népét.", java.time.LocalDateTime.now().plusDays(1).withHour(19), 3500));
-        movies.add(new Movie("Oppenheimer", "/images/film2.jpg", "Az atombomba atyjának története, aki megváltoztatta a világot.", java.time.LocalDateTime.now().plusDays(1).withHour(21), 3500));
+        movies.add(new Movie("Borat", "/images/film1.jpg", "Borat, a kazah médiavilág sajátos alakja az ország Tájékoztatási Minisztériumának megbízásából dokumentumfilmet forgat Amerikában.", java.time.LocalDateTime.now().plusDays(1).withHour(19), 3500));
+        movies.add(new Movie("KPop Demon Hunters", "/images/film2.jpg", "Amikor a K-pop szupersztárok éppen nem stadionokat töltenek, akkor titokban démonvadászként dolgoznak azon, hogy megvédjék rajongóikat a természetfeletti veszélyektől.", java.time.LocalDateTime.now().plusDays(1).withHour(21), 3500));
         movies.add(new Movie("Barbie", "/images/film3.jpg", "Barbie kalandjai a való világban, ahol rájön, hogy a tökéletesség nem minden.", java.time.LocalDateTime.now().plusDays(2).withHour(18), 3200));
         return movies;
     }
