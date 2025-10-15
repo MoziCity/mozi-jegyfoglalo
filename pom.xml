@@ -26,9 +26,16 @@
 		<tag/>
 		<url/>
 	</scm>
-	<properties>
-		<java.version>25</java.version>
-	</properties>
+
+
+    <properties>
+        <!-- A Java verzió, amit használni szeretnél. A Java 21 egy modern LTS verzió. -->
+        <java.version>25</java.version>
+        <!-- A JavaFX verzió. Fontos, hogy kompatibilis legyen a Java verzióval. -->
+        <javafx.version>25</javafx.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
