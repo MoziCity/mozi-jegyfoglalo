@@ -7,95 +7,103 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.MoziCity.mozi_jegyfoglalo.controller.ConfirmationController">
-    <top>
-        <VBox alignment="CENTER" styleClass="header" BorderPane.alignment="CENTER">
-            <children>
-                <Label text="MoziCity Jegyfoglaló" textFill="WHITE">
-                    <font>
-                        <Font name="System Bold" size="24.0" />
-                    </font>
-                </Label>
-                <Label text="Foglalás megerősítése" textFill="#e0e0e0">
-                    <font>
-                        <Font size="16.0" />
-                    </font>
-                </Label>
-            </children>
-            <padding>
-                <Insets bottom="20.0" top="20.0" />
-            </padding>
-        </VBox>
-    </top>
-    <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" BorderPane.alignment="CENTER">
-            <content>
-                <FlowPane fx:id="confirmationFlowPane" hgap="20.0" vgap="20.0">
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.MoziCity.mozi_jegyfoglalo.controller.ConfirmationController"
+           prefWidth="900" prefHeight="700">
+
+    <children>
+        <BorderPane maxWidth="900" maxHeight="700" style="-fx-background-color: #1a1a1a;">
+            <top>
+                <VBox alignment="CENTER" styleClass="header" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label text="MoziCity Jegyfoglaló" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="24.0" />
+                            </font>
+                        </Label>
+                        <Label text="Foglalás megerősítése" textFill="#e0e0e0">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+            </top>
+            <center>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" BorderPane.alignment="CENTER">
+                    <content>
+                        <FlowPane fx:id="confirmationFlowPane" hgap="20.0" vgap="20.0">
+                            <padding>
+                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                            </padding>
+                            <children>
+                                <VBox alignment="CENTER_LEFT" spacing="5.0" styleClass="confirmation-box">
+                                    <children>
+                                        <Label text="Film:" textFill="WHITE">
+                                            <font>
+                                                <Font name="System Bold" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="movieTitleLabel" text="Film címe" textFill="#e0e0e0" />
+                                    </children>
+                                </VBox>
+                                <VBox alignment="CENTER_LEFT" spacing="5.0" styleClass="confirmation-box">
+                                    <children>
+                                        <Label text="Időpont:" textFill="WHITE">
+                                            <font>
+                                                <Font name="System Bold" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="showtimeLabel" text="Vetítés ideje" textFill="#e0e0e0" />
+                                    </children>
+                                </VBox>
+                                <VBox alignment="CENTER_LEFT" spacing="5.0" styleClass="confirmation-box">
+                                    <children>
+                                        <Label text="Helyek:" textFill="WHITE">
+                                            <font>
+                                                <Font name="System Bold" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="seatsLabel" text="Helyek listája" textFill="#e0e0e0" />
+                                    </children>
+                                </VBox>
+                                <VBox alignment="CENTER_LEFT" spacing="5.0" styleClass="confirmation-box">
+                                    <children>
+                                        <Label text="Összesen:" textFill="WHITE">
+                                            <font>
+                                                <Font name="System Bold" size="14.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="totalPriceLabel" text="0 Ft" textFill="#4CAF50">
+                                            <font>
+                                                <Font name="System Bold" size="16.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </FlowPane>
+                    </content>
+                </ScrollPane>
+            </center>
+            <bottom>
+                <HBox alignment="CENTER" BorderPane.alignment="CENTER">
                     <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
                     <children>
-                        <VBox alignment="CENTER_LEFT" spacing="5.0" styleClass="confirmation-box">
-                            <children>
-                                <Label text="Film:" textFill="WHITE">
-                                    <font>
-                                        <Font name="System Bold" size="14.0" />
-                                    </font>
-                                </Label>
-                                <Label fx:id="movieTitleLabel" text="Film címe" textFill="#e0e0e0" />
-                            </children>
-                        </VBox>
-                        <VBox alignment="CENTER_LEFT" spacing="5.0" styleClass="confirmation-box">
-                            <children>
-                                <Label text="Időpont:" textFill="WHITE">
-                                    <font>
-                                        <Font name="System Bold" size="14.0" />
-                                    </font>
-                                </Label>
-                                <Label fx:id="showtimeLabel" text="Vetítés ideje" textFill="#e0e0e0" />
-                            </children>
-                        </VBox>
-                        <VBox alignment="CENTER_LEFT" spacing="5.0" styleClass="confirmation-box">
-                            <children>
-                                <Label text="Helyek:" textFill="WHITE">
-                                    <font>
-                                        <Font name="System Bold" size="14.0" />
-                                    </font>
-                                </Label>
-                                <Label fx:id="seatsLabel" text="Helyek listája" textFill="#e0e0e0" />
-                            </children>
-                        </VBox>
-                        <VBox alignment="CENTER_LEFT" spacing="5.0" styleClass="confirmation-box">
-                            <children>
-                                <Label text="Összesen:" textFill="WHITE">
-                                    <font>
-                                        <Font name="System Bold" size="14.0" />
-                                    </font>
-                                </Label>
-                                <Label fx:id="totalPriceLabel" text="0 Ft" textFill="#4CAF50">
-                                    <font>
-                                        <Font name="System Bold" size="16.0" />
-                                    </font>
-                                </Label>
-                            </children>
-                        </VBox>
+                        <Button mnemonicParsing="false" onAction="#handleBack" text="Vissza" />
+                        <Button mnemonicParsing="false" onAction="#handleConfirm" styleClass="action-button" text="Foglalás megerősítése" />
                     </children>
-                </FlowPane>
-            </content>
-        </ScrollPane>
-    </center>
-    <bottom>
-        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
-            <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-            </padding>
-            <children>
-                <Button mnemonicParsing="false" onAction="#handleBack" text="Vissza" />
-                <Button mnemonicParsing="false" onAction="#handleConfirm" styleClass="action-button" text="Foglalás megerősítése" />
-            </children>
-        </HBox>
-    </bottom>
-</BorderPane>
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </children>
+</StackPane>

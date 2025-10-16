@@ -23,24 +23,16 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-
-        // Fő ablak beállítása
         primaryStage.setTitle(APP_TITLE);
-        primaryStage.setResizable(false);
 
-        // Ablak méretének beállítása
-        primaryStage.setWidth(900);  // Ablak szélessége pixelben
-        primaryStage.setHeight(700); // Ablak magassága pixelben
+        // Az ablak maximalizálása az induláskor. Ez marad.
+        primaryStage.setMaximized(true);
 
-        primaryStage.centerOnScreen();
-
-        // Bezárás kezelése megerősítéssel
         primaryStage.setOnCloseRequest(event -> {
             event.consume();
             handleCloseRequest();
         });
 
-        // Kezdeti jelenet megjelenítése
         showMovieSelectionScene();
         primaryStage.show();
     }
@@ -57,7 +49,8 @@ public class MainApp extends Application {
             Scene scene = new Scene(root);
             applyStylesheet(scene);
             primaryStage.setScene(scene);
-            primaryStage.centerOnScreen();
+            // NINCS MÉRETEZÉS VAGY KOZPÉRA IGAZÍTÁS ITT
+
         } catch (IOException e) {
             showError("Hiba", "Nem sikerült betölteni a filmválasztó képernyőt:\n" + e.getMessage());
         }
@@ -76,7 +69,8 @@ public class MainApp extends Application {
             Scene scene = new Scene(root);
             applyStylesheet(scene);
             primaryStage.setScene(scene);
-            primaryStage.centerOnScreen();
+            // NINCS MÉRETEZÉS VAGY KOZPÉRA IGAZÍTÁS ITT
+
         } catch (IOException e) {
             showError("Hiba", "Nem sikerült betölteni a helyválasztó képernyőt:\n" + e.getMessage());
         }
@@ -95,7 +89,8 @@ public class MainApp extends Application {
             Scene scene = new Scene(root);
             applyStylesheet(scene);
             primaryStage.setScene(scene);
-            primaryStage.centerOnScreen();
+            // NINCS MÉRETEZÉS VAGY KOZPÉRA IGAZÍTÁS ITT
+
         } catch (IOException e) {
             showError("Hiba", "Nem sikerült betölteni a megerősítő képernyőt:\n" + e.getMessage());
         }

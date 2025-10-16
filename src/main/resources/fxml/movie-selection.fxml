@@ -7,49 +7,58 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.MoziCity.mozi_jegyfoglalo.controller.MovieSelectionController">
-    <top>
-        <VBox alignment="CENTER" styleClass="header" BorderPane.alignment="CENTER">
-            <children>
-                <Label text="MoziCity Jegyfoglaló" textFill="WHITE">
-                    <font>
-                        <Font name="System Bold" size="24.0" />
-                    </font>
-                </Label>
-                <Label text="Válasszon filmet a vetítéshez" textFill="#e0e0e0">
-                    <font>
-                        <Font size="16.0" />
-                    </font>
-                </Label>
-            </children>
-            <padding>
-                <Insets bottom="20.0" top="20.0" />
-            </padding>
-        </VBox>
-    </top>
-    <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" BorderPane.alignment="CENTER">
-            <content>
-                <FlowPane fx:id="moviesFlowPane" hgap="20.0" vgap="20.0">
+<!-- EZ AZ ÚJ GYÖKÉR ELEM: Középre igazítja a tartalmat és fix méretet ad neki -->
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.MoziCity.mozi_jegyfoglalo.controller.MovieSelectionController"
+           prefWidth="900" prefHeight="700">
+
+    <children>
+        <!-- Az eredeti BorderPane, maximális mérettel korlátozva -->
+        <BorderPane maxWidth="900" maxHeight="700" style="-fx-background-color: #1a1a1a;">
+            <top>
+                <VBox alignment="CENTER" styleClass="header" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label text="MoziCity Jegyfoglaló" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="24.0" />
+                            </font>
+                        </Label>
+                        <Label text="Válasszon filmet a vetítéshez" textFill="#e0e0e0">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                        </Label>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+            </top>
+            <center>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" BorderPane.alignment="CENTER">
+                    <content>
+                        <FlowPane fx:id="moviesFlowPane" hgap="20.0" vgap="20.0">
+                            <padding>
+                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                            </padding>
+                        </FlowPane>
+                    </content>
+                </ScrollPane>
+            </center>
+            <bottom>
+                <HBox alignment="CENTER" BorderPane.alignment="CENTER">
                     <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
-                </FlowPane>
-            </content>
-        </ScrollPane>
-    </center>
-    <bottom>
-        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
-            <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-            </padding>
-            <children>
-                <Button mnemonicParsing="false" onAction="#handleRefresh" text="Frissítés" />
-            </children>
-        </HBox>
-    </bottom>
-</BorderPane>
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#handleRefresh" text="Frissítés" />
+                    </children>
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </children>
+</StackPane>

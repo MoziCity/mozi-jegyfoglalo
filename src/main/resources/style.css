@@ -2,6 +2,10 @@
 .root {
     -fx-background-color: #1a1a1a;
     -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-min-width: 900px;
+    -fx-min-height: 700px;
+    -fx-max-width: 900px;
+    -fx-max-height: 700px;
 }
 
 .header {
@@ -23,7 +27,7 @@
     -fx-cursor: hand;
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
-    -fx-padding: 10 20;
+    -fx-padding: 0.5em 1em;
 }
 
 .button:hover {
