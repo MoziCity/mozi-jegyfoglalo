@@ -134,8 +134,8 @@
     -fx-border-style: solid;
     -fx-border-color: rgba(255, 255, 255, 0.1);
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
-    -fx-font-size: 9px; /* Egy kisebb méret, ami biztosan befér */
-    -fx-font-weight: 200; /* Egy kicsit vastagabb, hogy jobban olvasható legyen */
+    -fx-font-size: 12px; /* Egy kisebb méret, ami biztosan befér */
+    -fx-font-weight: 1000; /* Egy kicsit vastagabb, hogy jobban olvasható legyen */
 }
 
 .seat-free {
