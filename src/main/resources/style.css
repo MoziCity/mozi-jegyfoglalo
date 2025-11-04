@@ -1,107 +1,191 @@
+/* Importáljunk egy modern betűtípust */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
 /* Globális stílusok */
 .root {
-    -fx-background-color: #1a1a1a;
-    -fx-font-family: "Segoe UI", Arial, sans-serif;
-    -fx-min-width: 1000px;
-    -fx-min-height: 800px;
-    -fx-max-width: 1000px;
-    -fx-max-height: 800px;
+    -fx-font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #0a0a0a;
 }
 
+/* --- ÚJ DIZÁJN: FŐ HÁTTÉR --- */
+.main-background {
+    -fx-background-image: url('background.jpg');
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+}
+
+/* --- ÚJ DIZÁJN: ÜVEGPANEL-EFFEKTUS --- */
+.glass-panel {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 20, 0, 0, 10);
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-radius: 20px;
+    -fx-border-width: 1px;
+}
+
+/* --- ÚJ DIZÁJN: FEJLÉC --- */
 .header {
-    -fx-background-color: #2c2c2c;
-    -fx-padding: 10px;
+    -fx-background-color: transparent; /* Átlátszó */
+    -fx-padding: 25px;
 }
 
-.label {
-    -fx-text-fill: #e0e0e0;
-}
-
-
-/* Gombok stílusa */
-.button {
-    -fx-background-color: #555;
+.header .label {
     -fx-text-fill: white;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 700;
+    -fx-font-size: 28px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 5, 0, 0, 2);
+}
+
+.header .label:nth-child(2) {
+    -fx-font-weight: 400;
+    -fx-font-size: 16px;
+    -fx-effect: null;
+}
+
+/* --- ÚJ DIZÁJN: GOMBOK --- */
+.button {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1px;
     -fx-cursor: hand;
-    -fx-background-radius: 5px;
-    -fx-border-radius: 5px;
-    -fx-padding: 0.5em 1em;
+    -fx-padding: 12px 28px;
+    -fx-font-weight: 600;
+    -fx-font-size: 14px;
+    -fx-transition: all 0.3s ease;
 }
 
 .button:hover {
-    -fx-background-color: #777;
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-border-color: rgba(255, 255, 255, 0.4);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
 }
 
 .button:pressed {
-    -fx-background-color: #444;
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
 }
 
+/* Akciógombok - új élénk szín */
 .action-button {
-    -fx-background-color: #4CAF50;
-    -fx-font-size: 16px;
-    -fx-padding: 12 30;
+    -fx-background-color: #00e5ff; /* Élénk cián */
+    -fx-border-color: transparent;
+    -fx-text-fill: #0a0a0a; /* Sötét szöveg a világos háttéren */
+    -fx-effect: dropshadow(gaussian, #00e5ff, 10, 0.5, 0, 0);
 }
 
 .action-button:hover {
-    -fx-background-color: #66BB6A;
+    -fx-background-color: #18ffff;
+    -fx-effect: dropshadow(gaussian, #00e5ff, 15, 0.6, 0, 0);
 }
 
-.action-button:disabled {
-    -fx-background-color: #666;
-    -fx-cursor: default;
-}
-
-/* Filmkártya stílusa */
+/* --- ÚJ DIZÁJN: FILMKÁRTYÁK --- */
+/* --- ÚJ, MATTA KÁRTYA STÍLUS --- */
 .movie-card {
-    -fx-background-color: #2c2c2c;
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
-    -fx-border-color: #444;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
-    -fx-cursor: hand;
-    -fx-padding: 15;
+    -fx-background-color: rgba(0,0, 0, 0.3);
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-border-color: rgba(255, 255, 255, 0.15); /* Finom, de látható keret */
+    -fx-border-width: 1px;
+    -fx-padding: 15px;
     -fx-alignment: center;
-    -fx-spacing: 10;
+    -fx-spacing: 12px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 15, 0, 0, 8); /* Erősebb, kontúrozó árnyék */
+    -fx-transition: all 0.3s ease;
 }
 
 .movie-card:hover {
-    -fx-border-color: #4CAF50;
-    -fx-scale-x: 1.02;
-    -fx-scale-y: 1.02;
+    -fx-background-color: #282828; /* Hover-re egy kicsit világosabb matt szín */
+    -fx-border-color: #00e5ff; /* A hover keret színe a cián marad */
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, #00e5ff, 20, 0.4, 0, 0); /* Hover-effektus a cián színnel */
 }
 
-.select-button {
-    -fx-background-color: #2196F3;
+
+.movie-title {
+    -fx-font-weight: 600;
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
 }
 
-.select-button:hover {
-    -fx-background-color: #42A5F5;
+.movie-showtime {
+    -fx-text-fill: #b0b0b0;
 }
 
-/* Ülés gombok stílusa */
+.movie-price {
+    -fx-text-fill: #00e5ff;
+    -fx-font-weight: 600;
+    -fx-font-size: 15px;
+}
+
+/* --- ÚJ DIZÁJN: SZÉKEK --- */
+.seat-free, .seat-selected, .seat-taken {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-cursor: hand;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
+    -fx-font-size: 9px; /* Egy kisebb méret, ami biztosan befér */
+    -fx-font-weight: 200; /* Egy kicsit vastagabb, hogy jobban olvasható legyen */
+}
+
 .seat-free {
-    -fx-background-color: #4CAF50; /* Zöld */
+    -fx-background-color: #4caf50;
 }
 
 .seat-selected {
-    -fx-background-color: #FFC107; /* Sárga */
+    -fx-background-color: #ffc107;
+    -fx-border-color: #ffb300;
 }
 
 .seat-taken {
-    -fx-background-color: #757575; /* Szürke */
+    -fx-background-color: #424242;
+    -fx-cursor: default;
 }
 
 .legend-label {
-    -fx-text-fill: #e0e0e0;
-    -fx-font-size: 14px;
+    -fx-text-fill: #d0d0d0;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
 }
 
-/* Megerősítő képernyő stílusai */
+/* --- ÚJ DIZÁJN: MEGERŐSÍTŐ KÉPERNYŐ --- */
 .confirmation-box {
-    -fx-background-color: #2c2c2c;
-    -fx-background-radius: 5px;
-    -fx-padding: 15px;
-    -fx-spacing: 10px;
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1px;
+    -fx-padding: 25px;
+    -fx-spacing: 15px;
 }
+
+/* --- ÚJ DIZÁJN: TEXTFIELD --- */
+.text-field {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1px;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #888;
+    -fx-padding: 10px 15px;
+    -fx-font-weight: 400;
+}
+
+.text-field:focused {
+    -fx-border-color: #00e5ff;
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-effect: dropshadow(gaussian, #00e5ff, 5, 0.4, 0, 0);
+}
+
+

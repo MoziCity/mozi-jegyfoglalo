@@ -35,7 +35,7 @@
                 </VBox>
             </top>
             <center>
-                <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+                <VBox alignment="CENTER" BorderPane.alignment="CENTER" styleClass="glass-panel">
                     <children>
                         <Label text="Vászon" textFill="WHITE">
                             <VBox.margin>

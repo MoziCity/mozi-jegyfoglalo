@@ -67,7 +67,7 @@ public class MovieSelectionController {
 
         // Cím
         Label titleLabel = new Label(movie.getTitle());
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: white;");
+        titleLabel.getStyleClass().add("movie-title");
 
         // Időpont
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm");

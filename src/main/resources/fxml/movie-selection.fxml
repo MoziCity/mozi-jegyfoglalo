@@ -7,57 +7,47 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<!-- EZ AZ ÚJ GYÖKÉR ELEM: Középre igazítja a tartalmat és fix méretet ad neki -->
-<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.MoziCity.mozi_jegyfoglalo.controller.MovieSelectionController">
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.MoziCity.mozi_jegyfoglalo.controller.MovieSelectionController"
+            styleClass="main-background"> <!-- <- ITT VAN A HÁTTÉRKÉP -->
 
-    <children>
-        <!-- Az eredeti BorderPane, maximális mérettel korlátozva -->
-        <BorderPane maxWidth="1920" maxHeight="1080" style="-fx-background-color: #1a1a1a;">
-            <top>
-                <VBox alignment="CENTER" styleClass="header" BorderPane.alignment="CENTER">
-                    <children>
-                        <Label text="MoziCity Jegyfoglaló" textFill="WHITE">
-                            <font>
-                                <Font name="System Bold" size="24.0" />
-                            </font>
-                        </Label>
-                        <Label text="Válasszon filmet a vetítéshez" textFill="#e0e0e0">
-                            <font>
-                                <Font size="16.0" />
-                            </font>
-                        </Label>
-                    </children>
-                    <padding>
-                        <Insets bottom="20.0" top="20.0" />
-                    </padding>
-                </VBox>
-            </top>
-            <center>
-                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" BorderPane.alignment="CENTER">
-                    <content>
-                        <FlowPane fx:id="moviesFlowPane" hgap="20.0" vgap="20.0">
-                            <padding>
-                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                            </padding>
-                        </FlowPane>
-                    </content>
-                </ScrollPane>
-            </center>
-            <bottom>
-                <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+    <top>
+        <VBox alignment="CENTER" styleClass="header" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="MoziCity Jegyfoglaló" />
+                <Label text="Válasszon filmet a vetítéshez" style="-fx-font-size: 16px; -fx-font-weight: 400;"/>
+            </children>
+            <padding>
+                <Insets bottom="20.0" top="20.0" />
+            </padding>
+        </VBox>
+    </top>
+
+    <center>
+        <!-- A ScrollPane legyen átlátszó, hogy látszódjon alóla a háttér -->
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" BorderPane.alignment="CENTER"
+                    style="-fx-background: transparent; -fx-background-color: transparent;">
+            <content>
+                <!-- A FlowPane, ami a filmeket tartalmazza, kapja az "üveges" effektust -->
+                <FlowPane fx:id="moviesFlowPane" hgap="20.0" vgap="20.0" styleClass="glass-panel">
                     <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
-                    <children>
-                        <Button mnemonicParsing="false" onAction="#handleRefresh" text="Frissítés" />
-                    </children>
-                </HBox>
-            </bottom>
-        </BorderPane>
-    </children>
-</StackPane>
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+                <Button mnemonicParsing="false" onAction="#handleRefresh" text="Frissítés" />
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>
