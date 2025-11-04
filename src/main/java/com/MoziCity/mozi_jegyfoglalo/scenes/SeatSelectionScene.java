@@ -4,10 +4,9 @@ import com.MoziCity.mozi_jegyfoglalo.MainApp;
 import com.MoziCity.mozi_jegyfoglalo.model.Movie;
 import com.MoziCity.mozi_jegyfoglalo.model.Seat;
 import com.MoziCity.mozi_jegyfoglalo.model.SeatStatus;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,27 +20,46 @@ import javafx.scene.text.FontWeight;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 public class SeatSelectionScene extends Scene {
 
-    private static final double WIDTH = 800;
+    private static final double WIDTH = 900;
     private static final double HEIGHT = 700;
     private final GridPane seatGrid = new GridPane();
-    private final List<Seat> allSeats = new ArrayList<>();
-    private final List<Seat> selectedSeats = new ArrayList<>();
+    // FONTOS: ArrayList helyett ObservableList-et használunk
+    private final ObservableList<Seat> allSeats = FXCollections.observableArrayList();
+    private final ObservableList<Seat> selectedSeats = FXCollections.observableArrayList();
     private final Movie movie;
     private final MainApp mainApp;
 
     public SeatSelectionScene(Movie movie, MainApp mainApp) {
-        super(new VBox(20), WIDTH, HEIGHT);
+        super(new VBox(), WIDTH, HEIGHT);
         this.movie = movie;
         this.mainApp = mainApp;
         VBox root = (VBox) getRoot();
 
-        root.setAlignment(Pos.CENTER);
-        root.setPadding(new Insets(20));
-        root.getStyleClass().add("root");
+        // Stíluslap alkalmazása
+        getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+
+        // Cím
+        Label titleLabel = new Label("Válasszon üléseket");
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 36));
+        titleLabel.setTextFill(Color.WHITE);
+
+        // Film információ
+        HBox movieInfoBox = new HBox(20);
+        movieInfoBox.setAlignment(Pos.CENTER);
+        movieInfoBox.setPadding(new Insets(10));
+
+        Label movieLabel = new Label("Film: " + movie.getTitle());
+        movieLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        movieLabel.setTextFill(Color.WHITE);
+
+        Label priceLabel = new Label("Jegyár: " + movie.getPrice() + " Ft");
+        priceLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        priceLabel.setTextFill(Color.web("#FFC107"));
+
+        movieInfoBox.getChildren().addAll(movieLabel, priceLabel);
 
         // Mozi vászon
         Label screenLabel = new Label("VÁSZON");
@@ -60,17 +78,23 @@ public class SeatSelectionScene extends Scene {
 
         // Folytatás gomb
         Button continueButton = new Button("Tovább a fizetéshez");
-        continueButton.getStyleClass().add("action-button");
+        continueButton.getStyleClass().add("select-button");
         continueButton.setDisable(true); // Alapértelmezetten letiltva
 
-        // Gomb engedélyezése/letiltása a kiválasztott ülések alapján
-        BooleanProperty hasSelection = new SimpleBooleanProperty(false);
-        hasSelection.bind(Bindings.createBooleanBinding((Callable<Boolean>) () -> !selectedSeats.isEmpty(), (Observable) selectedSeats));
-        continueButton.disableProperty().bind(hasSelection.not());
+        // JAVÍTOTT BINDING: Az ObservableList változásait most már figyelni tudja.
+        // A gomb akkor van engedélyezve, ha a selectedSeats lista NEM üres.
+        continueButton.disableProperty().bind(Bindings.isEmpty(selectedSeats));
 
-        continueButton.setOnAction(e -> mainApp.showConfirmationScene(movie, new ArrayList<>(selectedSeats)));
+        continueButton.setOnAction(e -> {
+            // Átadjuk egy új ArrayList-ként a kiválasztott helyeket, hogy a következő jelenet ne módosítsa az eredeti listát.
+            mainApp.showConfirmationScene(movie, new ArrayList<>(selectedSeats));
+        });
 
-        root.getChildren().addAll(screenLabel, seatGrid, legend, continueButton);
+        root.setAlignment(Pos.CENTER);
+        root.setSpacing(20);
+        root.setPadding(new Insets(20));
+        root.getChildren().addAll(titleLabel, movieInfoBox, screenLabel, seatGrid, legend, continueButton);
+        root.getStyleClass().add("root");
     }
 
     private void initializeSeats() {
@@ -92,6 +116,7 @@ public class SeatSelectionScene extends Scene {
         seatGrid.setHgap(5);
         seatGrid.setVgap(5);
         seatGrid.setAlignment(Pos.CENTER);
+        seatGrid.setPadding(new Insets(20));
 
         int colIndex = 0;
         for (Seat seat : allSeats) {
@@ -146,26 +171,39 @@ public class SeatSelectionScene extends Scene {
     private HBox createLegend() {
         HBox legend = new HBox(20);
         legend.setAlignment(Pos.CENTER);
+        legend.setPadding(new Insets(10));
 
-        Label freeLabel = new Label("Szabad");
-        freeLabel.getStyleClass().add("legend-label");
+        VBox freeBox = new VBox(5);
+        freeBox.setAlignment(Pos.CENTER);
         Pane freePane = new Pane();
         freePane.setPrefSize(20, 20);
         freePane.getStyleClass().add("seat-free");
+        Label freeLabel = new Label("Szabad");
+        freeLabel.setFont(Font.font(14));
+        freeLabel.setTextFill(Color.WHITE);
+        freeBox.getChildren().addAll(freePane, freeLabel);
 
-        Label selectedLabel = new Label("Kiválasztva");
-        selectedLabel.getStyleClass().add("legend-label");
+        VBox selectedBox = new VBox(5);
+        selectedBox.setAlignment(Pos.CENTER);
         Pane selectedPane = new Pane();
         selectedPane.setPrefSize(20, 20);
         selectedPane.getStyleClass().add("seat-selected");
+        Label selectedLabel = new Label("Kiválasztva");
+        selectedLabel.setFont(Font.font(14));
+        selectedLabel.setTextFill(Color.WHITE);
+        selectedBox.getChildren().addAll(selectedPane, selectedLabel);
 
-        Label takenLabel = new Label("Foglalt");
-        takenLabel.getStyleClass().add("legend-label");
+        VBox takenBox = new VBox(5);
+        takenBox.setAlignment(Pos.CENTER);
         Pane takenPane = new Pane();
         takenPane.setPrefSize(20, 20);
         takenPane.getStyleClass().add("seat-taken");
+        Label takenLabel = new Label("Foglalt");
+        takenLabel.setFont(Font.font(14));
+        takenLabel.setTextFill(Color.WHITE);
+        takenBox.getChildren().addAll(takenPane, takenLabel);
 
-        legend.getChildren().addAll(freePane, freeLabel, selectedPane, selectedLabel, takenPane, takenLabel);
+        legend.getChildren().addAll(freeBox, selectedBox, takenBox);
         return legend;
     }
 }
