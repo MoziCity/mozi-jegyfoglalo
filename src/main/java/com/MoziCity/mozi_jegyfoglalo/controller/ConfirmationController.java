@@ -1,4 +1,5 @@
 package com.MoziCity.mozi_jegyfoglalo.controller;
+import com.MoziCity.mozi_jegyfoglalo.db.DatabaseManager;
 
 import com.MoziCity.mozi_jegyfoglalo.MainApp;
 import com.MoziCity.mozi_jegyfoglalo.model.Movie;
@@ -26,10 +27,11 @@ public class ConfirmationController {
     private MainApp mainApp;
     private Movie movie;
     private List<Seat> selectedSeats;
+    private DatabaseManager dbManager;
 
     @FXML
     public void initialize() {
-        // Inicializálás
+        dbManager = new DatabaseManager();
     }
 
     public void setMainApp(MainApp mainApp) {
@@ -65,17 +67,32 @@ public class ConfirmationController {
 
     @FXML
     private void handleConfirm() {
-        // Ide jönne a foglalás mentése adatbázisba
+            // A "showInfo" felugró ablak helyett most már VALÓDI mentést végzünk
 
-        // Most csak egy üzenetet jelenítünk meg
-        mainApp.showInfo("Sikeres foglalás",
-                "Köszönjük a foglalását!\n\n" +
-                        "Film: " + movie.getTitle() + "\n" +
-                        "Időpont: " + movie.getShowtime().format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm")) + "\n" +
-                        "Helyek: " + selectedSeats.stream().map(Seat::getSeatId).collect(Collectors.joining(", ")) + "\n" +
-                        "Összesen: " + (movie.getPrice() * selectedSeats.size()) + " Ft");
+            int totalPrice = movie.getPrice() * selectedSeats.size();
 
-        // Vissza a filmválasztó képernyőre
-        mainApp.showMovieSelectionScene();
-    }
+            // Megpróbáljuk elmenteni a foglalást az adatbázisba
+            boolean success = dbManager.saveBooking(movie.getVetitesId(), selectedSeats, totalPrice);
+
+            if (success) {
+                // SIKERES MENTÉS ESETÉN
+                // Most már jogosan jelenítjük meg a sikeres üzenetet
+                String seatsText = selectedSeats.stream().map(Seat::getSeatId).collect(Collectors.joining(", "));
+                mainApp.showInfo("Sikeres foglalás",
+                        "Köszönjük a foglalását!\n\n" +
+                                "Film: " + movie.getTitle() + "\n" +
+                                "Időpont: " + movie.getShowtime().format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm")) + "\n" +
+                                "Helyek: " + seatsText + "\n" +
+                                "Összesen: " + totalPrice + " Ft");
+
+                // Vissza a filmválasztó képernyőre
+                mainApp.showMovieSelectionScene();
+
+            } else {
+                // SIKERTELEN MENTÉS ESETÉN
+                mainApp.showError("Foglalási hiba",
+                        "Sajnos hiba történt a foglalás mentése közben. Kérjük, próbálja újra később.");
+                // (Itt maradhatunk a megerősítő képernyőn)
+            }
+        }
 }

@@ -308,48 +308,78 @@ public class DatabaseManager {
 
         return seats;
     }
-
     /**
-     * Elmenti a foglalást az adatbázisba.
-     * Ez váltja ki a ConfirmationController-ben lévő kommentet.
+     * Elmenti a foglalást az adatbázisba ÉS frissíti a helyek státuszát.
+     * Ez egy tranzakció: vagy mindkét művelet sikerül, vagy egyik sem.
      *
-     * A PDF sémája [cite: 90] alapján a 'Foglalasok' táblába írunk.
+     * @param vetitesId A vetítés egyedi azonosítója.
+     * @param selectedSeats A kiválasztott Seat objektumok listája.
+     * @param totalPrice A foglalás teljes ára.
+     * @return true, ha a foglalás sikeres volt, false egyébként.
      */
-    public boolean saveBooking(int vetitesId, List<Seat> selectedSeats) {
-        // A PDF 'Foglalasok' táblája: id, vetites_id, felhasznalo_id, ules, ar, foglalas_datuma [cite: 90]
-        // "ules" TEXT [cite: 90] -> "A1, A2"
-        // "felhasznalo_id" -> Ezt most '1' -nek vesszük (dummy user)
+    public boolean saveBooking(int vetitesId, List<Seat> selectedSeats, int totalPrice) {
+        // SQL parancs a 'Foglalasok' táblába való beszúráshoz [cite: 90]
+        String insertBookingSql = "INSERT INTO Foglalasok(vetites_id, ules, ar, foglalas_datuma) VALUES(?,?,?,?)";
 
-        String sql = "INSERT INTO Foglalasok(vetites_id, felhasznalo_id, ules, ar, foglalas_datuma) VALUES(?,?,?,?,?)";
+        // SQL parancs a 'Helyek' tábla frissítéséhez
+        String updateSeatsSql = "UPDATE Helyek SET statusz = 'TAKEN' WHERE vetites_id = ? AND sor = ? AND szam = ?";
 
-        try (Connection conn = this.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = this.connect();
 
-            // Itt össze kell gyűjteni az ülésazonosítókat
-            String seatsStr = selectedSeats.stream()
-                    .map(Seat::getSeatId)
-                    .collect(Collectors.joining(", "));
+        try {
+            // ----- Tranzakció indítása -----
+            conn.setAutoCommit(false);
 
-            // Ár kiszámítása (egyszerűsítve, az első hely árával)
-            // Ide egy 'vetites' objektum kéne, ami tudja az árat.
-            // Tegyük fel, hogy 3000 Ft az ár.
-            double ar = 3000 * selectedSeats.size();
+            // 1. Foglalás beszúrása
+            try (PreparedStatement pstmtBooking = conn.prepareStatement(insertBookingSql)) {
 
-            pstmt.setInt(1, vetitesId);
-            pstmt.setInt(2, 1); // Dummy felhasználó ID
-            pstmt.setString(3, seatsStr);
-            pstmt.setDouble(4, ar);
-            pstmt.setString(5, LocalDateTime.now().format(dbFormatter));
+                String seatsStr = selectedSeats.stream()
+                        .map(Seat::getSeatId)
+                        .collect(Collectors.joining(", "));
 
-            int affectedRows = pstmt.executeUpdate();
+                pstmtBooking.setInt(1, vetitesId);
+                pstmtBooking.setString(2, seatsStr);
+                pstmtBooking.setDouble(3, totalPrice);
+                pstmtBooking.setString(4, LocalDateTime.now().format(dbFormatter)); // dbFormatter-t feljebb definiáltuk
+                pstmtBooking.executeUpdate();
+            }
 
-            // hogy a 'SELECTED' helyek 'TAKEN' státuszúak legyenek!
+            // 2. Helyek frissítése 'TAKEN' státuszra (Batch update)
+            try (PreparedStatement pstmtUpdateSeats = conn.prepareStatement(updateSeatsSql)) {
+                for (Seat seat : selectedSeats) {
+                    pstmtUpdateSeats.setInt(1, vetitesId);
+                    pstmtUpdateSeats.setString(2, seat.getRow());
+                    pstmtUpdateSeats.setInt(3, seat.getNumber());
+                    pstmtUpdateSeats.addBatch(); // Hozzáadás a köteghez
+                }
+                pstmtUpdateSeats.executeBatch(); // Köteg végrehajtása
+            }
 
-            return affectedRows > 0;
+            // ----- Tranzakció véglegesítése (Commit) -----
+            conn.commit();
+            return true; // Siker
 
         } catch (SQLException e) {
-            System.err.println("Hiba a foglalás mentésekor: " + e.getMessage());
-            return false;
+            System.err.println("Hiba a foglalás mentésekor, tranzakció visszavonva: " + e.getMessage());
+            // ----- Hiba esetén visszavonás (Rollback) -----
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                System.err.println("Hiba a rollback közben: " + ex.getMessage());
+            }
+            return false; // Sikertelenség
+
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true); // Visszaállás normál módba
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("Hiba a kapcsolat lezárásakor: " + e.getMessage());
+            }
         }
     }
 }
