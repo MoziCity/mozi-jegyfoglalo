@@ -1,4 +1,5 @@
 package com.MoziCity.mozi_jegyfoglalo.controller;
+import com.MoziCity.mozi_jegyfoglalo.db.DatabaseManager;
 
 import com.MoziCity.mozi_jegyfoglalo.MainApp;
 import com.MoziCity.mozi_jegyfoglalo.model.Movie;
@@ -28,13 +29,14 @@ public class SeatSelectionController {
 
     private MainApp mainApp;
     private Movie movie;
-    private List<Seat> seats;
     private List<Seat> selectedSeats;
+    private DatabaseManager dbManager;
 
     @FXML
     public void initialize() {
         selectedSeats = new ArrayList<>();
         continueButton.setDisable(true);
+        dbManager = new DatabaseManager();
     }
 
     public void setMainApp(MainApp mainApp) {
@@ -54,41 +56,24 @@ public class SeatSelectionController {
     }
 
     private void loadSeats() {
-        seats = new ArrayList<>();
-        for (char row = 'A'; row <= 'H'; row++) {
-            for (int number = 1; number <= 10; number++) {
-                SeatStatus status = Math.random() < 0.2 ? SeatStatus.TAKEN : SeatStatus.FREE;
-                seats.add(new Seat(String.valueOf(row), number, status));
-            }
-        }
-        displaySeats();
+        List<Seat> seats = dbManager.getSeatsForShow(movie.getVetitesId());
+        displaySeats(seats);
     }
 
-    private void displaySeats() {
+    private void displaySeats(List<Seat> seats) {
         seatsGridPane.getChildren().clear();
+
         for (Seat seat : seats) {
-            // 1. LÉPÉS: Összeállítjuk a szöveget
-            String seatLabelText = seat.getRow() + seat.getNumber();
-
-            // 2. LÉPÉS: DEBUG - Kiírjuk a konzolra, mi a szöveg
-            // Futtasd a programot, és nézd meg a konzolt (a kimeneti ablakot az IDE-ben).
-            // Itt látnod kell, hogy "A1", "A2" stb. szövegek jönnek-e létre.
-            System.out.println("DEBUG: Creating button with text: " + seatLabelText);
-
-            // 3. LÉPÉS: Létrehozzuk a gombot a szöveggel
-            Button seatButton = new Button(seatLabelText);
-
-            // 4. LÉPÉS: Beállítjuk a méretet - NÖVELTÜK a méretet, hogy biztosan elférjen a szöveg
-            seatButton.setPrefSize(50, 50); // Méret növelése 40x50-ről 50x50-re
-            seatButton.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE); // Ne legyen kisebb a beállított méretnél
-            seatButton.setMaxSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE); // Ne legyen nagyobb a beállított méretnél
+            Button seatButton = new Button(seat.getSeatId());
+            seatButton.setPrefSize(40, 40);
 
             updateSeatButtonStyle(seatButton, seat);
+
             seatButton.setOnAction(e -> handleSeatClick(seat, seatButton));
 
-            int rowIndex = seat.getRow().charAt(0) - 'A';
-            int colIndex = seat.getNumber() - 1;
-            seatsGridPane.add(seatButton, colIndex, rowIndex);
+            int row = seat.getRow().charAt(0) - 'A';
+            int col = seat.getNumber() - 1;
+            seatsGridPane.add(seatButton, col, row);
         }
     }
 

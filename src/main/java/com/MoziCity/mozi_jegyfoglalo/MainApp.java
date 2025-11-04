@@ -3,6 +3,7 @@ package com.MoziCity.mozi_jegyfoglalo;
 import com.MoziCity.mozi_jegyfoglalo.controller.*;
 import com.MoziCity.mozi_jegyfoglalo.model.Movie;
 import com.MoziCity.mozi_jegyfoglalo.model.Seat;
+import com.MoziCity.mozi_jegyfoglalo.db.DatabaseManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,8 +24,13 @@ public class MainApp extends Application {
     private static final String APP_TITLE = "MoziCity Jegyfoglaló";
     private Scene scene;
 
+
+
     @Override
     public void start(Stage primaryStage) {
+        DatabaseManager dbManager = new DatabaseManager();
+        dbManager.setupDatabase();
+
         this.primaryStage = primaryStage;
         primaryStage.setTitle(APP_TITLE);
 

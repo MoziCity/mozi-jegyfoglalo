@@ -1,6 +1,7 @@
 package com.MoziCity.mozi_jegyfoglalo.controller;
 
 import com.MoziCity.mozi_jegyfoglalo.MainApp;
+import com.MoziCity.mozi_jegyfoglalo.db.DatabaseManager;
 import com.MoziCity.mozi_jegyfoglalo.model.Movie;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -16,13 +17,14 @@ import java.util.List;
 public class MovieSelectionController {
     @FXML
     private FlowPane moviesFlowPane;
-
+    private DatabaseManager dbManager;
     private MainApp mainApp;
     private List<Movie> movies;
 
     @FXML
     public void initialize() {
         // Inicializálás - ide jönnek a filmek betöltése
+        dbManager = new DatabaseManager();
         loadMovies();
     }
 
@@ -31,21 +33,11 @@ public class MovieSelectionController {
     }
 
     private void loadMovies() {
-        // Ide jönne a filmek betöltése adatbázisból vagy szolgáltatásból
-        // Most csak példa adatokkal dolgozunk
-        movies = List.of(
-                new Movie("Borat", "/images/film1.jpg", "A Borat: Kazah nép nagy fehér gyermeke Amerikába megy.",
-                        java.time.LocalDateTime.now().plusDays(1).withHour(18).withMinute(0), 2500),
-                new Movie("K-pop démonvadászok", "/images/film2.jpg", "A K-pop démonvadászok 2025-ben bemutatott amerikai animációs film.",
-                        java.time.LocalDateTime.now().plusDays(1).withHour(20).withMinute(30), 2200),
-                new Movie("Barbie", "/images/film3.jpg", "A Barbie 2023-ban bemutatott amerikai fantasy filmvígjáték.",
-                        java.time.LocalDateTime.now().plusDays(2).withHour(19).withMinute(0), 2400)
-        );
-
-        displayMovies();
+        List<Movie> movies = dbManager.getAllMovies();
+        displayMovies(movies);
     }
 
-    private void displayMovies() {
+    private void displayMovies(List<Movie> movies) {
         moviesFlowPane.getChildren().clear();
 
         for (Movie movie : movies) {
