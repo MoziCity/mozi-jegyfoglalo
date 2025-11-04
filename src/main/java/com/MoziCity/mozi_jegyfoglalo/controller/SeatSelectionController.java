@@ -54,42 +54,46 @@ public class SeatSelectionController {
     }
 
     private void loadSeats() {
-        // Ide jönne a helyek betöltése adatbázisból
-        // Most csak példa adatokkal dolgozunk
         seats = new ArrayList<>();
-
-        // 8 sor, 10 szék soronként
         for (char row = 'A'; row <= 'H'; row++) {
             for (int number = 1; number <= 10; number++) {
-                // Néhány véletlenszerűen foglalt hely
                 SeatStatus status = Math.random() < 0.2 ? SeatStatus.TAKEN : SeatStatus.FREE;
                 seats.add(new Seat(String.valueOf(row), number, status));
             }
         }
-
         displaySeats();
     }
 
     private void displaySeats() {
         seatsGridPane.getChildren().clear();
-
         for (Seat seat : seats) {
-            Button seatButton = new Button(seat.getSeatId());
-            seatButton.setPrefSize(40, 40);
+            // 1. LÉPÉS: Összeállítjuk a szöveget
+            String seatLabelText = seat.getRow() + seat.getNumber();
+
+            // 2. LÉPÉS: DEBUG - Kiírjuk a konzolra, mi a szöveg
+            // Futtasd a programot, és nézd meg a konzolt (a kimeneti ablakot az IDE-ben).
+            // Itt látnod kell, hogy "A1", "A2" stb. szövegek jönnek-e létre.
+            System.out.println("DEBUG: Creating button with text: " + seatLabelText);
+
+            // 3. LÉPÉS: Létrehozzuk a gombot a szöveggel
+            Button seatButton = new Button(seatLabelText);
+
+            // 4. LÉPÉS: Beállítjuk a méretet - NÖVELTÜK a méretet, hogy biztosan elférjen a szöveg
+            seatButton.setPrefSize(50, 50); // Méret növelése 40x50-ről 50x50-re
+            seatButton.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE); // Ne legyen kisebb a beállított méretnél
+            seatButton.setMaxSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE); // Ne legyen nagyobb a beállított méretnél
 
             updateSeatButtonStyle(seatButton, seat);
-
             seatButton.setOnAction(e -> handleSeatClick(seat, seatButton));
 
-            int row = seat.getRow().charAt(0) - 'A';
-            int col = seat.getNumber() - 1;
-            seatsGridPane.add(seatButton, col, row);
+            int rowIndex = seat.getRow().charAt(0) - 'A';
+            int colIndex = seat.getNumber() - 1;
+            seatsGridPane.add(seatButton, colIndex, rowIndex);
         }
     }
 
     private void updateSeatButtonStyle(Button button, Seat seat) {
         button.getStyleClass().removeAll("seat-free", "seat-selected", "seat-taken");
-
         switch (seat.getStatus()) {
             case FREE:
                 button.getStyleClass().add("seat-free");
@@ -107,9 +111,7 @@ public class SeatSelectionController {
     }
 
     private void handleSeatClick(Seat seat, Button button) {
-        if (seat.getStatus() == SeatStatus.TAKEN) {
-            return;
-        }
+        if (seat.getStatus() == SeatStatus.TAKEN) return;
 
         if (seat.getStatus() == SeatStatus.FREE) {
             seat.setStatus(SeatStatus.SELECTED);

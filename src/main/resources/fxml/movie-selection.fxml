@@ -17,7 +17,7 @@
 
     <children>
         <!-- Az eredeti BorderPane, maximális mérettel korlátozva -->
-        <BorderPane maxWidth="900" maxHeight="700" style="-fx-background-color: #1a1a1a;">
+        <BorderPane maxWidth="1920" maxHeight="1080" style="-fx-background-color: #1a1a1a;">
             <top>
                 <VBox alignment="CENTER" styleClass="header" BorderPane.alignment="CENTER">
                     <children>

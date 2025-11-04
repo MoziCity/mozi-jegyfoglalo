@@ -34,7 +34,7 @@ public class MainApp extends Application {
         });
 
         // 1. Hozz létre egyetlen Scene-t egy üres VBox-szal (ez a placeholder)
-        scene = new Scene(new VBox(), 1280, 720); // Kezdő méret, de a maximized felülírja
+        scene = new Scene(new VBox(), 1920, 1080); // Kezdő méret, de a maximized felülírja
 
         // 2. Alkalmazd a stíluslapot CSAK EGYSZER
         applyStylesheet(scene);

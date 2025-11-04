@@ -22,7 +22,7 @@
 .button {
     -fx-background-color: #555;
     -fx-text-fill: white;
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
     -fx-background-radius: 5px;
