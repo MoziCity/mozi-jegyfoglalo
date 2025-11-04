@@ -13,8 +13,7 @@
 
 <!-- EZ AZ ÚJ GYÖKÉR ELEM: Középre igazítja a tartalmat és fix méretet ad neki -->
 <StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.MoziCity.mozi_jegyfoglalo.controller.MovieSelectionController"
-           prefWidth="900" prefHeight="700">
+           fx:controller="com.MoziCity.mozi_jegyfoglalo.controller.MovieSelectionController">
 
     <children>
         <!-- Az eredeti BorderPane, maximális mérettel korlátozva -->

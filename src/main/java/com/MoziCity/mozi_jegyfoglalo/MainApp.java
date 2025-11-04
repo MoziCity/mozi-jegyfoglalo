@@ -9,31 +9,44 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region; // <-- FONTOS: Importálni kell a Region osztályt
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import javafx.scene.layout.VBox;
 
 public class MainApp extends Application {
 
     private Stage primaryStage;
     private static final String APP_TITLE = "MoziCity Jegyfoglaló";
+    private Scene scene;
 
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         primaryStage.setTitle(APP_TITLE);
 
-        // Az ablak maximalizálása az induláskor. Ez marad.
-        primaryStage.setMaximized(true);
-
         primaryStage.setOnCloseRequest(event -> {
             event.consume();
             handleCloseRequest();
         });
 
+        // 1. Hozz létre egyetlen Scene-t egy üres VBox-szal (ez a placeholder)
+        scene = new Scene(new VBox(), 1280, 720); // Kezdő méret, de a maximized felülírja
+
+        // 2. Alkalmazd a stíluslapot CSAK EGYSZER
+        applyStylesheet(scene);
+
+        // 3. Add a Scene-t az ablakhoz
+        primaryStage.setScene(scene);
+
+        // 4. Töltsd be az első valódi nézetet (ez lecseréli a VBox-ot)
         showMovieSelectionScene();
+
+        // 5. CSAK MOST maximalizáld és mutasd meg
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
@@ -46,10 +59,7 @@ public class MainApp extends Application {
             MovieSelectionController controller = loader.getController();
             controller.setMainApp(this);
 
-            Scene scene = new Scene(root);
-            applyStylesheet(scene);
-            primaryStage.setScene(scene);
-            // NINCS MÉRETEZÉS VAGY KOZPÉRA IGAZÍTÁS ITT
+            scene.setRoot(root);
 
         } catch (IOException e) {
             showError("Hiba", "Nem sikerült betölteni a filmválasztó képernyőt:\n" + e.getMessage());
@@ -66,10 +76,7 @@ public class MainApp extends Application {
             controller.setMainApp(this);
             controller.setMovie(movie);
 
-            Scene scene = new Scene(root);
-            applyStylesheet(scene);
-            primaryStage.setScene(scene);
-            // NINCS MÉRETEZÉS VAGY KOZPÉRA IGAZÍTÁS ITT
+            scene.setRoot(root);
 
         } catch (IOException e) {
             showError("Hiba", "Nem sikerült betölteni a helyválasztó képernyőt:\n" + e.getMessage());
@@ -86,10 +93,7 @@ public class MainApp extends Application {
             controller.setMainApp(this);
             controller.setBookingDetails(movie, selectedSeats);
 
-            Scene scene = new Scene(root);
-            applyStylesheet(scene);
-            primaryStage.setScene(scene);
-            // NINCS MÉRETEZÉS VAGY KOZPÉRA IGAZÍTÁS ITT
+            scene.setRoot(root);
 
         } catch (IOException e) {
             showError("Hiba", "Nem sikerült betölteni a megerősítő képernyőt:\n" + e.getMessage());
