@@ -65,7 +65,7 @@ public class SeatSelectionController {
 
         for (Seat seat : seats) {
             Button seatButton = new Button(seat.getSeatId());
-            seatButton.setPrefSize(40, 40);
+            seatButton.setPrefSize(55, 55);
 
             updateSeatButtonStyle(seatButton, seat);
 
