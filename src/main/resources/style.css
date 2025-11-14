@@ -32,7 +32,7 @@
 }
 
 .header .label {
-    -fx-text-fill: white;
+    -fx-text-fill: #ffffff;
     -fx-font-weight: 700;
     -fx-font-size: 28px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 5, 0, 0, 2);
@@ -176,7 +176,7 @@
     -fx-border-radius: 10px;
     -fx-border-color: rgba(255, 255, 255, 0.2);
     -fx-border-width: 1px;
-    -fx-text-fill: white;
+    -fx-text-fill: #000000;
     -fx-prompt-text-fill: #888;
     -fx-padding: 10px 15px;
     -fx-font-weight: 400;
