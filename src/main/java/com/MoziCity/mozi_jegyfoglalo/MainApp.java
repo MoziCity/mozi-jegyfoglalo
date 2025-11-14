@@ -157,29 +157,22 @@ public class MainApp extends Application {
     public void showAddMovieScene() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/fxml/add-movie.fxml"));
+            // Ellenőrizzük, hogy megvan-e a fájl!
+            java.net.URL resource = getClass().getResource("/fxml/add-movie.fxml");
+            if (resource == null) {
+                throw new java.io.FileNotFoundException("Nem található az FXML fájl: /fxml/add-movie.fxml");
+            }
+            loader.setLocation(resource);
+
             Parent root = loader.load();
 
             AddMovieController controller = loader.getController();
             controller.setMainApp(this);
 
-            scene.setRoot(root); // A meglévő Scene gyökerét cseréljük
+            scene.setRoot(root);
 
-        } catch (IOException e) {
-            showError("Hiba", "Nem sikerült betölteni az admin felületet:\n" + e.getMessage());
-        }
-
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/fxml/add-movie.fxml"));
-            Parent root = loader.load();
-
-            AddMovieController controller = loader.getController();
-            controller.setMainApp(this);
-
-            scene.setRoot(root); // A meglévő Scene gyökerét cseréljük
-
-        } catch (IOException e) {
+        } catch (Exception e) { // Átírtuk Exception-re, hogy MINDENT elkapjon
+            e.printStackTrace(); // Kiírjuk a konzolra is a biztonság kedvéért
             showError("Hiba", "Nem sikerült betölteni az admin felületet:\n" + e.getMessage());
         }
     }

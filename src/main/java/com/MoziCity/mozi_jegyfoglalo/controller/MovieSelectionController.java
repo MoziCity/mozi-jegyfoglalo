@@ -103,18 +103,15 @@ public class MovieSelectionController {
         loadMovies();
     }
 
-    // EZ AZ ÚJ METÓDUS
     @FXML
     private void handleAddNewMovie() {
-        mainApp.showAddMovieScene();
-    }
-
-    @FXML
-    private void handleAddNewMovie(ActionEvent actionEvent) {
         if (mainApp != null) {
             mainApp.showAddMovieScene();
         } else {
-            LOGGER.warning("mainApp nincs beállítva!");
+            LOGGER.warning("A mainApp referencia null, nem lehet navigálni!");
         }
     }
+
+
+
 }
