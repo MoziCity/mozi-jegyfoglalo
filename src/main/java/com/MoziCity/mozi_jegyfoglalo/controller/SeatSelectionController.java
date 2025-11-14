@@ -38,6 +38,19 @@ public class SeatSelectionController {
         continueButton.setDisable(true);
         dbManager = new DatabaseManager();
     }
+    @FXML
+    private void handleRefresh() {
+        loadMovies();
+    }
+
+    private void loadMovies() {
+    }
+
+    // EZ AZ ÚJ METÓDUS
+    @FXML
+    private void handleAddNewMovie() {
+        mainApp.showAddMovieScene();
+    }
 
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;

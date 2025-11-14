@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 public class DatabaseManager {
 
+
+
     private static final String DB_URL = "jdbc:sqlite:mozi.db";
 
     // Formátum a LocalDateTime tárolásához az adatbázisban (TEXT-ként)
@@ -183,6 +185,69 @@ public class DatabaseManager {
             System.err.println("Hiba a dummy adatok betöltésekor: " + e.getMessage());
         } finally {
             conn.setAutoCommit(true); // Visszaállás normál módba
+        }
+
+    }
+    public boolean addNewMovieAndShowtime(String title, String description, String imageUrl,
+                                          String date, String time, double price) {
+
+        String insertFilmSql = "INSERT INTO Filmek (cim, leiras, imageUrl) VALUES (?,?,?)";
+        String insertVetitesSql = "INSERT INTO Vetitesek (film_id, datum, idopont, jegyar) VALUES (?,?,?,?)";
+        String insertHelyekSql = "INSERT INTO Helyek (vetites_id, sor, szam, statusz) VALUES (?,?,?,?)";
+
+        Connection conn = this.connect();
+        try {
+            conn.setAutoCommit(false); // Tranzakció indítása
+
+            int filmId;
+            int vetitesId;
+
+            // 1. Film beszúrása
+            try (PreparedStatement pstmtFilm = conn.prepareStatement(insertFilmSql, new String[]{"id"})) {
+                pstmtFilm.setString(1, title);
+                pstmtFilm.setString(2, description);
+                pstmtFilm.setString(3, imageUrl);
+                pstmtFilm.executeUpdate();
+                filmId = getGeneratedId(pstmtFilm); // Segédmetódusunk használata
+            }
+
+            // 2. Vetítés beszúrása
+            try (PreparedStatement pstmtVetites = conn.prepareStatement(insertVetitesSql, new String[]{"id"})) {
+                pstmtVetites.setInt(1, filmId);
+                pstmtVetites.setString(2, date);   // Formátum: "YYYY-MM-DD"
+                pstmtVetites.setString(3, time);   // Formátum: "HH:mm"
+                pstmtVetites.setDouble(4, price);
+                pstmtVetites.executeUpdate();
+                vetitesId = getGeneratedId(pstmtVetites);
+            }
+
+            // 3. Helyek generálása a vetítéshez
+            try (PreparedStatement pstmtHely = conn.prepareStatement(insertHelyekSql)) {
+                // Hívjuk a meglévő segédmetódusunkat, ami már tudja, hogy 'FREE' helyeket kell csinálni
+                generateSeatsForShow(pstmtHely, vetitesId);
+            }
+
+            conn.commit(); // Tranzakció véglegesítése
+            System.out.println("Új film és vetítés sikeresen mentve.");
+            return true;
+
+        } catch (SQLException e) {
+            System.err.println("Hiba az új film mentésekor, rollback: " + e.getMessage());
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                System.err.println("Hiba rollback közben: " + ex.getMessage());
+            }
+            return false;
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("Hiba a kapcsolat lezárásakor: " + e.getMessage());
+            }
         }
     }
 
@@ -382,4 +447,7 @@ public class DatabaseManager {
             }
         }
     }
+
+
+
 }

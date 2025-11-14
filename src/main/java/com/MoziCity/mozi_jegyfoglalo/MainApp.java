@@ -154,6 +154,37 @@ public class MainApp extends Application {
         return result.isPresent() && result.get() == ButtonType.OK;
     }
 
+    public void showAddMovieScene() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/add-movie.fxml"));
+            Parent root = loader.load();
+
+            AddMovieController controller = loader.getController();
+            controller.setMainApp(this);
+
+            scene.setRoot(root); // A meglévő Scene gyökerét cseréljük
+
+        } catch (IOException e) {
+            showError("Hiba", "Nem sikerült betölteni az admin felületet:\n" + e.getMessage());
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/add-movie.fxml"));
+            Parent root = loader.load();
+
+            AddMovieController controller = loader.getController();
+            controller.setMainApp(this);
+
+            scene.setRoot(root); // A meglévő Scene gyökerét cseréljük
+
+        } catch (IOException e) {
+            showError("Hiba", "Nem sikerült betölteni az admin felületet:\n" + e.getMessage());
+        }
+    }
+
+
     public Stage getPrimaryStage() {
         return primaryStage;
     }

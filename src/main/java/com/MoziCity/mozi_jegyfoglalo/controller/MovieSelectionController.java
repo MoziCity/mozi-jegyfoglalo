@@ -3,6 +3,7 @@ package com.MoziCity.mozi_jegyfoglalo.controller;
 import com.MoziCity.mozi_jegyfoglalo.MainApp;
 import com.MoziCity.mozi_jegyfoglalo.db.DatabaseManager;
 import com.MoziCity.mozi_jegyfoglalo.model.Movie;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,13 +14,16 @@ import javafx.scene.layout.VBox;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MovieSelectionController {
+    private static final Logger LOGGER = Logger.getLogger(MovieSelectionController.class.getName());
+
     @FXML
     private FlowPane moviesFlowPane;
     private DatabaseManager dbManager;
     private MainApp mainApp;
-    private List<Movie> movies;
 
     @FXML
     public void initialize() {
@@ -59,6 +63,7 @@ public class MovieSelectionController {
             imageView.setFitHeight(300);
             imageView.setPreserveRatio(true);
         } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Nem sikerült betölteni a képet a filmhez: " + movie.getTitle(), e);
             // Ha a kép nem elérhető, használjunk placeholder-t
             imageView.setFitWidth(200);
             imageView.setFitHeight(300);
@@ -81,15 +86,35 @@ public class MovieSelectionController {
         // Kiválasztás gomb
         Button selectButton = new Button("Kiválasztás");
         selectButton.getStyleClass().add("select-button");
-        selectButton.setOnAction(e -> mainApp.showSeatSelectionScene(movie));
+        selectButton.setOnAction(e -> {
+            if (mainApp != null) {
+                mainApp.showSeatSelectionScene(movie);
+            } else {
+                LOGGER.warning("mainApp nincs beállítva!");
+            }
+        });
 
         card.getChildren().addAll(imageView, titleLabel, showtimeLabel, priceLabel, selectButton);
 
         return card;
     }
-
     @FXML
     private void handleRefresh() {
         loadMovies();
+    }
+
+    // EZ AZ ÚJ METÓDUS
+    @FXML
+    private void handleAddNewMovie() {
+        mainApp.showAddMovieScene();
+    }
+
+    @FXML
+    private void handleAddNewMovie(ActionEvent actionEvent) {
+        if (mainApp != null) {
+            mainApp.showAddMovieScene();
+        } else {
+            LOGGER.warning("mainApp nincs beállítva!");
+        }
     }
 }
