@@ -1,6 +1,5 @@
 package com.MoziCity.mozi_jegyfoglalo.controller;
 
-import javafx.event.ActionEvent;
 import com.MoziCity.mozi_jegyfoglalo.MainApp;
 import com.MoziCity.mozi_jegyfoglalo.db.DatabaseManager;
 import javafx.fxml.FXML;
@@ -13,8 +12,6 @@ import javafx.scene.paint.Color;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-
-
 public class AddMovieController {
 
     @FXML private TextField titleField;
@@ -24,27 +21,25 @@ public class AddMovieController {
     @FXML private TextField timeField;
     @FXML private TextField priceField;
     @FXML private Label statusLabel;
-    public void handleBack(ActionEvent actionEvent) {
-    }
 
-    public void handleSave(ActionEvent actionEvent) {
-    }
     private MainApp mainApp;
     private DatabaseManager dbManager;
 
     @FXML
     public void initialize() {
         dbManager = new DatabaseManager();
-        statusLabel.setText(""); // Üres státusz üzenet
+        statusLabel.setText("");
     }
 
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
     }
 
+    // JAVÍTOTT METÓDUSOK
+    // Az alábbi két metódus a logikát tartalmazza.
+    // Az üres, ActionEvent paraméterrel rendelkező metódusokat töröltem, hogy ne legyen duplikáció.
     @FXML
     private void handleSave() {
-        // 1. Adatok kiolvasása
         String title = titleField.getText();
         String description = descriptionArea.getText();
         String imageUrl = imageUrlField.getText();
@@ -52,20 +47,17 @@ public class AddMovieController {
         String time = timeField.getText();
         String priceStr = priceField.getText();
 
-        // 2. Validálás (ellenőrzés)
         if (title == null || title.isEmpty() || date == null ||
                 time == null || time.isEmpty() || priceStr == null || priceStr.isEmpty()) {
-            showError("Minden csillagozott mező kitöltése kötelező!"); // (Most mind az)
+            showError("Minden csillagozott mező kitöltése kötelező!");
             return;
         }
 
-        // Időpont formátum ellenőrzése (egyszerű)
         if (!time.matches("\\d{2}:\\d{2}")) {
             showError("Helytelen időpont formátum! (Helyes: HH:mm)");
             return;
         }
 
-        // Ár ellenőrzése
         double price;
         try {
             price = Double.parseDouble(priceStr);
@@ -74,15 +66,12 @@ public class AddMovieController {
             return;
         }
 
-        // Dátum formázása az adatbázisnak
         String dateStr = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        // 3. Mentés az adatbázisba
         boolean success = dbManager.addNewMovieAndShowtime(title, description, imageUrl, dateStr, time, price);
 
         if (success) {
             showSuccess("Film sikeresen hozzáadva!");
-            // Űrlap kiürítése
             titleField.clear();
             descriptionArea.clear();
             imageUrlField.clear();

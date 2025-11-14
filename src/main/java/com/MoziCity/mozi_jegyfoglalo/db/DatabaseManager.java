@@ -382,6 +382,10 @@ public class DatabaseManager {
      * @param totalPrice A foglalás teljes ára.
      * @return true, ha a foglalás sikeres volt, false egyébként.
      */
+
+
+
+
     public boolean saveBooking(int vetitesId, List<Seat> selectedSeats, int totalPrice) {
         // SQL parancs a 'Foglalasok' táblába való beszúráshoz [cite: 90]
         String insertBookingSql = "INSERT INTO Foglalasok(vetites_id, ules, ar, foglalas_datuma) VALUES(?,?,?,?)";
@@ -444,6 +448,62 @@ public class DatabaseManager {
                 }
             } catch (SQLException e) {
                 System.err.println("Hiba a kapcsolat lezárásakor: " + e.getMessage());
+            }
+        }
+    }
+
+    // DatabaseManager.java
+
+    public boolean deleteShowtime(int vetitesId) {
+        String deleteFoglalasok = "DELETE FROM Foglalasok WHERE vetites_id = ?";
+        String deleteHelyek = "DELETE FROM Helyek WHERE vetites_id = ?";
+        String deleteVetites = "DELETE FROM Vetitesek WHERE id = ?";
+
+        Connection conn = this.connect();
+        try {
+            conn.setAutoCommit(false); // Tranzakció indítása
+
+            // 1. Foglalások törlése
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteFoglalasok)) {
+                pstmt.setInt(1, vetitesId);
+                pstmt.executeUpdate();
+            }
+
+            // 2. Helyek törlése
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteHelyek)) {
+                pstmt.setInt(1, vetitesId);
+                pstmt.executeUpdate();
+            }
+
+            // 3. Maga a vetítés törlése
+            try (PreparedStatement pstmt = conn.prepareStatement(deleteVetites)) {
+                pstmt.setInt(1, vetitesId);
+                int affectedRows = pstmt.executeUpdate();
+
+                if (affectedRows == 0) {
+                    throw new SQLException("Nem található a törlendő vetítés.");
+                }
+            }
+
+            conn.commit();
+            return true;
+
+        } catch (SQLException e) {
+            System.err.println("Hiba a törlés során: " + e.getMessage());
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            return false;
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }
