@@ -6,6 +6,7 @@ import com.MoziCity.mozi_jegyfoglalo.model.Movie;
 import com.MoziCity.mozi_jegyfoglalo.model.Seat;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField; // FONTOS IMPORT
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,6 +24,12 @@ public class ConfirmationController {
 
     @FXML
     private Label totalPriceLabel;
+
+    @FXML
+    private TextField nameTextField; // EZT KERESTE AZ FXML
+
+    @FXML
+    private TextField emailTextField; // EZT IS KERESTE AZ FXML
 
     private MainApp mainApp;
     private Movie movie;
@@ -67,32 +74,47 @@ public class ConfirmationController {
 
     @FXML
     private void handleConfirm() {
-            // A "showInfo" felugró ablak helyett most már VALÓDI mentést végzünk
 
-            int totalPrice = movie.getPrice() * selectedSeats.size();
+        // 1. Adatok lekérése és validálása
+        String customerName = nameTextField.getText().trim();
+        String customerEmail = emailTextField.getText().trim();
 
-            // Megpróbáljuk elmenteni a foglalást az adatbázisba
-            boolean success = dbManager.saveBooking(movie.getVetitesId(), selectedSeats, totalPrice);
-
-            if (success) {
-                // SIKERES MENTÉS ESETÉN
-                // Most már jogosan jelenítjük meg a sikeres üzenetet
-                String seatsText = selectedSeats.stream().map(Seat::getSeatId).collect(Collectors.joining(", "));
-                mainApp.showInfo("Sikeres foglalás",
-                        "Köszönjük a foglalását!\n\n" +
-                                "Film: " + movie.getTitle() + "\n" +
-                                "Időpont: " + movie.getShowtime().format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm")) + "\n" +
-                                "Helyek: " + seatsText + "\n" +
-                                "Összesen: " + totalPrice + " Ft");
-
-                // Vissza a filmválasztó képernyőre
-                mainApp.showMovieSelectionScene();
-
-            } else {
-                // SIKERTELEN MENTÉS ESETÉN
-                mainApp.showError("Foglalási hiba",
-                        "Sajnos hiba történt a foglalás mentése közben. Kérjük, próbálja újra később.");
-                // (Itt maradhatunk a megerősítő képernyőn)
-            }
+        if (customerName.isEmpty()) {
+            mainApp.showError("Hiányzó adat", "Kérjük, adja meg a nevét a foglaláshoz!");
+            return; // Megállítjuk a folyamatot
         }
+
+        // Alapvető e-mail validáció
+        if (customerEmail.isEmpty() || !customerEmail.contains("@") || !customerEmail.contains(".")) {
+            mainApp.showError("Érvénytelen adat", "Kérjük, adjon meg egy érvényes e-mail címet!");
+            return; // Megállítjuk a folyamatot
+        }
+
+        int totalPrice = movie.getPrice() * selectedSeats.size();
+
+        // 2. Megpróbáljuk elmenteni a foglalást az adatbázisba
+        // FIGYELEM: Ehhez módosítanod kell a DatabaseManager.java-t!
+        // (A metódus aláírását, hogy fogadja a nevet és emailt)
+        boolean success = dbManager.saveBooking(movie.getVetitesId(), selectedSeats, totalPrice, customerName, customerEmail);
+
+        if (success) {
+            // 3. SIKERES MENTÉS ESETÉN (Üzenet kiegészítve a névvel)
+            String seatsText = selectedSeats.stream().map(Seat::getSeatId).collect(Collectors.joining(", "));
+            mainApp.showInfo("Sikeres foglalás",
+                    "Köszönjük a foglalását, " + customerName + "!\n" + // Név hozzáadva
+                            "A visszaigazolást hamarosan elküldjük (" + customerEmail + ").\n\n" +
+                            "Film: " + movie.getTitle() + "\n" +
+                            "Időpont: " + movie.getShowtime().format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm")) + "\n" +
+                            "Helyek: " + seatsText + "\n" +
+                            "Összesen: " + totalPrice + " Ft");
+
+            // Vissza a filmválasztó képernyőre
+            mainApp.showMovieSelectionScene();
+
+        } else {
+            // 4. SIKERTELEN MENTÉS ESETÉN
+            mainApp.showError("Foglalási hiba",
+                    "Sajnos hiba történt a foglalás mentése közben. Kérjük, próbálja újra később.");
+        }
+    }
 }

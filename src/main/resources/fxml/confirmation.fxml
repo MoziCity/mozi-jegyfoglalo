@@ -4,7 +4,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ScrollPane?> <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -60,6 +61,12 @@
                             </children>
                         </VBox>
 
+                        <VBox alignment="CENTER_LEFT" spacing="8.0" styleClass="confirmation-box">
+                            <children>
+                                <Label text="Név (a foglaláshoz):" style="-fx-font-weight: 600;" />
+                                <TextField fx:id="nameTextField" promptText="Pl. Gipsz Jakab" />
+                            </children>
+                        </VBox>
                         <VBox alignment="CENTER_LEFT" spacing="8.0" styleClass="confirmation-box">
                             <children>
                                 <Label text="E-mail (a jegyek küldéséhez):" style="-fx-font-weight: 600;" />
