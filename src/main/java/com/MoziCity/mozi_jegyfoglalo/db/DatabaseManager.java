@@ -385,6 +385,7 @@ public class DatabaseManager {
 
 
 
+    //Test
 
     public boolean saveBooking(int vetitesId, List<Seat> selectedSeats, int totalPrice) {
         // SQL parancs a 'Foglalasok' táblába való beszúráshoz [cite: 90]
