@@ -143,7 +143,23 @@ public class MainApp extends Application {
         return result.isPresent() && result.get() == ButtonType.OK;
     }
 
-    // ... a MainApp többi része változatlan ...
+    public void showMovieDetailsScene(Movie movie) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/movie-details.fxml"));
+            Parent root = loader.load();
+
+            MovieDetailsController controller = loader.getController();
+            controller.setMainApp(this);
+            controller.setMovie(movie); // Itt adjuk át a filmet az új oldalnak
+
+            scene.setRoot(root);
+
+        } catch (IOException e) {
+            showError("Hiba", "Nem sikerült betölteni a film adatlapját:\n" + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     public void showAddMovieScene() {
         System.out.println("DEBUG: A showAddMovieScene() metódus elindult."); // <-- EZT ADTUK HOZZÁ

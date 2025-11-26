@@ -215,7 +215,8 @@ public class MovieSelectionController {
         selectButton.getStyleClass().add("select-button");
         selectButton.setOnAction(e -> {
             if (mainApp != null) {
-                mainApp.showSeatSelectionScene(movie);
+                // Most már a Részletek oldalra navigálunk!
+                mainApp.showMovieDetailsScene(movie);
             } else {
                 LOGGER.warning("mainApp nincs beállítva!");
             }
