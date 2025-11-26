@@ -18,14 +18,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.TextField;
+import javafx.scene.control.DatePicker;
+import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class MovieSelectionController {
     private static final Logger LOGGER = Logger.getLogger(MovieSelectionController.class.getName());
 
-    @FXML
-    private FlowPane moviesFlowPane;
-    @FXML
-    private Button addMovieButton; // Ez az új @FXML referencia az FXML-ből
+    @FXML private FlowPane moviesFlowPane;
+    @FXML private Button addMovieButton;
+    @FXML private TextField searchField;
+    @FXML private DatePicker filterDatePicker;
 
     private DatabaseManager dbManager;
     private MainApp mainApp;
@@ -33,15 +38,27 @@ public class MovieSelectionController {
     // Admin állapot követése
     private boolean adminMode = false;
 
+    private List<Movie> allMovies = new ArrayList<>();
+
     @FXML
     public void initialize() {
         dbManager = new DatabaseManager();
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            applyFilters();
+        });
+
+        // Figyeljük a dátumválasztót is
+        filterDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
+            applyFilters();
+        });
         loadMovies();
     }
 
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
     }
+
+
 
     // === Eseménykezelők ===
 
@@ -115,8 +132,34 @@ public class MovieSelectionController {
     // === Privát segédmetódusok ===
 
     private void loadMovies() {
-        List<Movie> movies = dbManager.getAllMovies();
-        displayMovies(movies);
+        allMovies = dbManager.getAllMovies();
+        applyFilters();
+    }
+
+    private void applyFilters() {
+        String searchText = searchField.getText().toLowerCase().trim();
+        LocalDate selectedDate = filterDatePicker.getValue();
+
+        List<Movie> filteredList = allMovies.stream()
+                .filter(movie -> {
+                    // 1. Cím szűrése (ha van beírva szöveg)
+                    boolean matchesTitle = true;
+                    if (!searchText.isEmpty()) {
+                        matchesTitle = movie.getTitle().toLowerCase().contains(searchText);
+                    }
+
+                    // 2. Dátum szűrése (ha van kiválasztva dátum)
+                    boolean matchesDate = true;
+                    if (selectedDate != null) {
+                        // A LocalDateTime-ból kivesszük a LocalDate részt az összehasonlításhoz
+                        matchesDate = movie.getShowtime().toLocalDate().equals(selectedDate);
+                    }
+
+                    return matchesTitle && matchesDate;
+                })
+                .collect(Collectors.toList());
+
+        displayMovies(filteredList);
     }
 
     private void displayMovies(List<Movie> movies) {
@@ -147,6 +190,14 @@ public class MovieSelectionController {
 
         Label titleLabel = new Label(movie.getTitle());
         titleLabel.getStyleClass().add("movie-title");
+        titleLabel.setWrapText(true);
+
+        Label descLabel = new Label(movie.getDescription());
+        descLabel.setWrapText(true);
+        descLabel.setMaxWidth(200);
+        descLabel.setMaxHeight(60);
+
+        descLabel.setStyle("-fx-text-fill: #bbbbbb; -fx-font-size: 12px;");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm");
         Label showtimeLabel = new Label(movie.getShowtime().format(formatter));
@@ -179,7 +230,13 @@ public class MovieSelectionController {
             buttonBox.getChildren().add(deleteButton);
         }
 
-        card.getChildren().addAll(imageView, titleLabel, showtimeLabel, priceLabel, buttonBox);
+        card.getChildren().addAll(imageView, titleLabel, descLabel, showtimeLabel, priceLabel, buttonBox);
         return card;
+    }
+
+    @FXML
+    private void handleClearFilters() {
+        searchField.clear();
+        filterDatePicker.setValue(null);
     }
 }
