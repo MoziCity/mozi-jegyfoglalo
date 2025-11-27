@@ -43,8 +43,8 @@ public class DatabaseManager {
     public void setupDatabase() {
         try {
             // Ez indítja el a webes felületet a 8082-es porton
-            Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
-            System.out.println("H2 Web Konzol elindítva: http://localhost:8082");
+            Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8081").start();
+            System.out.println("H2 Web Konzol elindítva: http://localhost:8081");
         } catch (SQLException e) {
             System.err.println("Nem sikerült elindítani a web konzolt: " + e.getMessage());
         }
@@ -418,6 +418,19 @@ public class DatabaseManager {
                     throw new SQLException("Nem sikerült létrehozni a felhasználót, nincs ID.");
                 }
             }
+        }
+    }
+    public void shutdown() {
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement()) {
+
+            // Ez a parancs utasítja a H2-t, hogy azonnal mentsen el mindent,
+            // zárja be a kapcsolatokat és törölje a .lock fájlt.
+            stmt.execute("SHUTDOWN");
+            System.out.println("Adatbázis szabályosan leállítva.");
+
+        } catch (SQLException e) {
+            System.err.println("Hiba az adatbázis leállításakor: " + e.getMessage());
         }
     }
 }

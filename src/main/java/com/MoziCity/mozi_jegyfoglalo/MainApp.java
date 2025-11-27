@@ -198,6 +198,14 @@ public class MainApp extends Application {
         return primaryStage;
     }
 
+    @Override
+    public void stop() throws Exception {
+        System.out.println("Alkalmazás leállítása...");
+        DatabaseManager dbManager = new DatabaseManager();
+        dbManager.shutdown();
+        System.exit(0);
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
