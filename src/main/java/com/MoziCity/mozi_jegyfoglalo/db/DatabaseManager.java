@@ -4,28 +4,33 @@ import com.MoziCity.mozi_jegyfoglalo.model.Movie;
 import com.MoziCity.mozi_jegyfoglalo.model.Seat;
 import com.MoziCity.mozi_jegyfoglalo.model.SeatStatus;
 
-import java.sql.*; // Importáljuk a Statement-et is
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.h2.tools.Server;
 
 public class DatabaseManager {
 
-    private static final String DB_URL = "jdbc:sqlite:mozi.db";
+    // --- H2 BEÁLLÍTÁSOK ---
+    // A ./mozi_db azt jelenti, hogy a projekt mappájában hozza létre a fájlt.
+    // Az AUTO_SERVER=TRUE teszi lehetővé, hogy futás közben te is megnyisd (pl. IntelliJ-ből).
+    private static final String DB_URL = "jdbc:h2:./mozi_db;AUTO_SERVER=TRUE";
+    private static final String DB_USER = "sa";
+    private static final String DB_PASS = "";
 
-    // Formátum a LocalDateTime tárolásához az adatbázisban (TEXT-ként)
+    // Formátum a LocalDateTime tárolásához
     private final DateTimeFormatter dbFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     /**
-     * Csatlakozik az SQLite adatbázishoz.
-     * @return Connection objektum
+     * Csatlakozik a H2 adatbázishoz.
      */
     private Connection connect() {
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection(DB_URL);
+            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
         } catch (SQLException e) {
             System.err.println("Hiba a csatlakozáskor: " + e.getMessage());
         }
@@ -33,99 +38,108 @@ public class DatabaseManager {
     }
 
     /**
-     * Létrehozza az adatbázis sémát (táblákat), ha azok még nem léteznek,
-     * és feltölti őket alapértelmezett adatokkal.
+     * Létrehozza a sémát H2 szintaxissal.
      */
     public void setupDatabase() {
-        // A 'Filmek' tábla a PDF és a Movie modell alapján
+        try {
+            // Ez indítja el a webes felületet a 8082-es porton
+            Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
+            System.out.println("H2 Web Konzol elindítva: http://localhost:8082");
+        } catch (SQLException e) {
+            System.err.println("Nem sikerült elindítani a web konzolt: " + e.getMessage());
+        }
+
         String createFilmekTable = "CREATE TABLE IF NOT EXISTS Filmek (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "cim TEXT NOT NULL," +
-                "leiras TEXT," +
-                "imageUrl TEXT" + // Ez a te Movie modelledhez kell
+                "id INT AUTO_INCREMENT PRIMARY KEY," +
+                "cim VARCHAR(255) NOT NULL," +
+                "leiras TEXT," + // A H2 támogatja a TEXT-et hosszú szövegekhez
+                "imageUrl VARCHAR(500)" +
                 ");";
 
-        // A 'Vetitesek' tábla a PDF és a Movie modell alapján
         String createVetitesekTable = "CREATE TABLE IF NOT EXISTS Vetitesek (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "film_id INTEGER NOT NULL," +
-                "datum TEXT NOT NULL," + // Pl. "2025-11-20"
-                "idopont TEXT NOT NULL," + // Pl. "18:00"
-                "jegyar REAL NOT NULL," + // Az ár a vetítéshez tartozik
+                "id INT AUTO_INCREMENT PRIMARY KEY," +
+                "film_id INT NOT NULL," +
+                "datum VARCHAR(20) NOT NULL," +
+                "idopont VARCHAR(10) NOT NULL," +
+                "jegyar DOUBLE NOT NULL," +
                 "FOREIGN KEY(film_id) REFERENCES Filmek(id)" +
                 ");";
 
-        // === ÚJ TÁBLA ===
-        // A 'Felhasznalok' tábla a nevek és e-mailek tárolására
         String createFelhasznalokTable = "CREATE TABLE IF NOT EXISTS Felhasznalok (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "nev TEXT NOT NULL," +
-                "email TEXT NOT NULL UNIQUE" + // Az e-mail egyedi
+                "id INT AUTO_INCREMENT PRIMARY KEY," +
+                "nev VARCHAR(255) NOT NULL," +
+                "email VARCHAR(255) NOT NULL UNIQUE" +
                 ");";
 
-        // A 'Helyek' tábla (ezt mi találtuk ki, de logikailag szükséges)
         String createHelyekTable = "CREATE TABLE IF NOT EXISTS Helyek (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "vetites_id INTEGER NOT NULL," +
-                "sor TEXT NOT NULL," + // 'A', 'B', 'C' ...
-                "szam INTEGER NOT NULL," + // 1, 2, 3 ...
-                "statusz TEXT NOT NULL DEFAULT 'FREE'," + // FREE, TAKEN
+                "id INT AUTO_INCREMENT PRIMARY KEY," +
+                "vetites_id INT NOT NULL," +
+                "sor VARCHAR(5) NOT NULL," +
+                "szam INT NOT NULL," +
+                "statusz VARCHAR(20) NOT NULL DEFAULT 'FREE'," +
                 "FOREIGN KEY(vetites_id) REFERENCES Vetitesek(id)" +
                 ");";
 
-        // === MÓDOSÍTOTT TÁBLA ===
-        // A 'Foglalasok' tábla most már helyesen hivatkozik a Felhasznalok-ra
         String createFoglalasokTable = "CREATE TABLE IF NOT EXISTS Foglalasok (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "vetites_id INTEGER NOT NULL," +
-                "felhasznalo_id INTEGER NOT NULL," + // <-- EZ MÁR NOT NULL
-                "ules TEXT NOT NULL," + // Pl. "A1, A2, A3"
-                "ar REAL NOT NULL," +
-                "foglalas_datuma TEXT NOT NULL," +
+                "id INT AUTO_INCREMENT PRIMARY KEY," +
+                "vetites_id INT NOT NULL," +
+                "felhasznalo_id INT NOT NULL," +
+                "ules VARCHAR(255) NOT NULL," +
+                "ar DOUBLE NOT NULL," +
+                "foglalas_datuma VARCHAR(50) NOT NULL," +
                 "FOREIGN KEY(vetites_id) REFERENCES Vetitesek(id)," +
-                "FOREIGN KEY(felhasznalo_id) REFERENCES Felhasznalok(id)" + // <-- ÚJ HIVATKOZÁS
+                "FOREIGN KEY(felhasznalo_id) REFERENCES Felhasznalok(id)" +
                 ");";
 
         try (Connection conn = this.connect();
-             java.sql.Statement stmt = conn.createStatement()) {
+             Statement stmt = conn.createStatement()) {
 
-            // Táblák létrehozása
             stmt.execute(createFilmekTable);
             stmt.execute(createVetitesekTable);
-            stmt.execute(createFelhasznalokTable); // <-- Új tábla létrehozása
+            stmt.execute(createFelhasznalokTable);
             stmt.execute(createHelyekTable);
             stmt.execute(createFoglalasokTable);
 
-            // ----- ADATOK FELTÖLTÉSE (CSAK HA ÜRES) -----
+            // Adatok feltöltése, ha üres
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Filmek");
+            rs.next();
             if (rs.getInt(1) == 0) {
                 System.out.println("Adatbázis inicializálása dummy adatokkal...");
                 populateDummyData(conn);
             }
+
+            // Kiírjuk a konzolra az elérési adatokat
+            System.out.println("--- H2 ADATBÁZIS ELINDULT ---");
+            System.out.println("URL: " + DB_URL);
+            System.out.println("User: sa");
+            System.out.println("Pass: (üres)");
+            System.out.println("-----------------------------");
 
         } catch (SQLException e) {
             System.err.println("Hiba az adatbázis setup közben: " + e.getMessage());
         }
     }
 
-    /**
-     * Feltölti az adatbázist próba adatokkal.
-     * (VÁLTOZATLAN)
-     */
     private void populateDummyData(Connection conn) throws SQLException {
-        // ... (Ez a metódus változatlan marad) ...
-        try (PreparedStatement pstmtFilm = conn.prepareStatement("INSERT INTO Filmek (cim, leiras, imageUrl) VALUES (?,?,?)", new String[]{"id"});
-             PreparedStatement pstmtVetites = conn.prepareStatement("INSERT INTO Vetitesek (film_id, datum, idopont, jegyar) VALUES (?,?,?,?)", new String[]{"id"});
-             PreparedStatement pstmtHely = conn.prepareStatement("INSERT INTO Helyek (vetites_id, sor, szam, statusz) VALUES (?,?,?,?)")) {
+        // H2-nél Statement.RETURN_GENERATED_KEYS-t használunk az ID visszakéréséhez
+
+        String insertFilm = "INSERT INTO Filmek (cim, leiras, imageUrl) VALUES (?,?,?)";
+        String insertVetites = "INSERT INTO Vetitesek (film_id, datum, idopont, jegyar) VALUES (?,?,?,?)";
+        String insertHely = "INSERT INTO Helyek (vetites_id, sor, szam, statusz) VALUES (?,?,?,?)";
+
+        try (PreparedStatement pstmtFilm = conn.prepareStatement(insertFilm, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement pstmtVetites = conn.prepareStatement(insertVetites, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement pstmtHely = conn.prepareStatement(insertHely)) {
 
             conn.setAutoCommit(false);
 
             // === Borat ===
             pstmtFilm.setString(1, "Borat");
             pstmtFilm.setString(2, "A Borat: Kazah nép nagy fehér gyermeke Amerikába megy.");
-            pstmtFilm.setString(3, "/images/film1.jpg");
+            pstmtFilm.setString(3, "https://m.media-amazon.com/images/M/MV5BMTk0MTQ3NDQ4Ml5BMl5BanBnXkFtZTcwOTQ3OTQzMw@@._V1_SX300.jpg");
             pstmtFilm.executeUpdate();
             int boratFilmId = getGeneratedId(pstmtFilm);
+
             pstmtVetites.setInt(1, boratFilmId);
             pstmtVetites.setString(2, "2025-11-10");
             pstmtVetites.setString(3, "18:00");
@@ -137,9 +151,10 @@ public class DatabaseManager {
             // === K-pop démonvadászok ===
             pstmtFilm.setString(1, "K-pop démonvadászok");
             pstmtFilm.setString(2, "A K-pop démonvadászok 2025-ben bemutatott amerikai animációs film.");
-            pstmtFilm.setString(3, "/images/film2.jpg");
+            pstmtFilm.setString(3, "https://image.tmdb.org/t/p/w500/qhb1qOilapbapxWQn9jtRCMwXJF.jpg");
             pstmtFilm.executeUpdate();
             int kpopFilmId = getGeneratedId(pstmtFilm);
+
             pstmtVetites.setInt(1, kpopFilmId);
             pstmtVetites.setString(2, "2025-11-10");
             pstmtVetites.setString(3, "20:30");
@@ -151,9 +166,10 @@ public class DatabaseManager {
             // === Barbie ===
             pstmtFilm.setString(1, "Barbie");
             pstmtFilm.setString(2, "A Barbie 2023-ban bemutatott amerikai fantasy filmvígjáték.");
-            pstmtFilm.setString(3, "/images/film3.jpg");
+            pstmtFilm.setString(3, "https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg");
             pstmtFilm.executeUpdate();
             int barbieFilmId = getGeneratedId(pstmtFilm);
+
             pstmtVetites.setInt(1, barbieFilmId);
             pstmtVetites.setString(2, "2025-11-11");
             pstmtVetites.setString(3, "19:00");
@@ -173,9 +189,7 @@ public class DatabaseManager {
         }
     }
 
-    /** Segédmetódus a frissen generált ID lekéréséhez (VÁLTOZATLAN) */
     private int getGeneratedId(PreparedStatement pstmt) throws SQLException {
-        // ... (Változatlan) ...
         try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
             if (generatedKeys.next()) {
                 return generatedKeys.getInt(1);
@@ -185,9 +199,7 @@ public class DatabaseManager {
         }
     }
 
-    /** Segédmetódus, legenerálja az ülőhelyeket (VÁLTOZATLAN) */
     private void generateSeatsForShow(PreparedStatement pstmtHely, int vetitesId) throws SQLException {
-        // ... (Változatlan) ...
         for (char row = 'A'; row <= 'H'; row++) {
             for (int number = 1; number <= 10; number++) {
                 pstmtHely.setInt(1, vetitesId);
@@ -200,11 +212,7 @@ public class DatabaseManager {
         pstmtHely.executeBatch();
     }
 
-    /**
-     * Lekérdezi az összes filmet (VÁLTOZATLAN)
-     */
     public List<Movie> getAllMovies() {
-        // ... (Ez a metódus változatlan marad) ...
         String sql = "SELECT v.id as vetites_id, f.cim, f.leiras, f.imageUrl, v.datum, v.idopont, v.jegyar " +
                 "FROM Filmek f " +
                 "JOIN Vetitesek v ON f.id = v.film_id";
@@ -230,11 +238,7 @@ public class DatabaseManager {
         return movies;
     }
 
-    /**
-     * Lekérdezi egy adott vetítés helyeit. (VÁLTOZATLAN)
-     */
     public List<Seat> getSeatsForShow(int vetitesId) {
-        // ... (Ez a metódus változatlan marad) ...
         String sql = "SELECT sor, szam, statusz FROM Helyek WHERE vetites_id = ?";
         List<Seat> seats = new ArrayList<>();
         try (Connection conn = this.connect();
@@ -253,21 +257,7 @@ public class DatabaseManager {
         return seats;
     }
 
-    /**
-     * Elmenti a foglalást az adatbázisba ÉS frissíti a helyek státuszát.
-     * EZ A METÓDUS MÁR HELYESEN MŰKÖDIK A NÉVVEL ÉS E-MAILLEL.
-     *
-     * @param vetitesId A vetítés egyedi azonosítója.
-     * @param selectedSeats A kiválasztott Seat objektumok listája.
-     * @param totalPrice A foglalás teljes ára.
-     * @param customerName A felhasználó neve.
-     * @param customerEmail A felhasználó e-mail címe.
-     * @return true, ha a foglalás sikeres volt, false egyébként.
-     */
     public boolean saveBooking(int vetitesId, List<Seat> selectedSeats, int totalPrice, String customerName, String customerEmail) {
-
-        // === MÓDOSÍTOTT SQL ===
-        // Most már a felhasznalo_id-t is beillesztjük
         String insertBookingSql = "INSERT INTO Foglalasok(vetites_id, felhasznalo_id, ules, ar, foglalas_datuma) VALUES(?,?,?,?,?)";
         String updateSeatsSql = "UPDATE Helyek SET statusz = 'TAKEN' WHERE vetites_id = ? AND sor = ? AND szam = ?";
 
@@ -276,25 +266,21 @@ public class DatabaseManager {
         try {
             conn.setAutoCommit(false);
 
-            // === 1. LÉPÉS (ÚJ): Felhasználó ID lekérése vagy létrehozása ===
+            // 1. Felhasználó kezelése
             int felhasznaloId = getOrCreateUser(conn, customerName, customerEmail);
 
-            // === 2. LÉPÉS: Foglalás beszúrása (MÓDOSÍTVA) ===
+            // 2. Foglalás mentése
             try (PreparedStatement pstmtBooking = conn.prepareStatement(insertBookingSql)) {
-
-                String seatsStr = selectedSeats.stream()
-                        .map(Seat::getSeatId)
-                        .collect(Collectors.joining(", "));
-
+                String seatsStr = selectedSeats.stream().map(Seat::getSeatId).collect(Collectors.joining(", "));
                 pstmtBooking.setInt(1, vetitesId);
-                pstmtBooking.setInt(2, felhasznaloId); // <-- EZ AZ ÚJ PARAMÉTER
+                pstmtBooking.setInt(2, felhasznaloId);
                 pstmtBooking.setString(3, seatsStr);
                 pstmtBooking.setDouble(4, totalPrice);
                 pstmtBooking.setString(5, LocalDateTime.now().format(dbFormatter));
                 pstmtBooking.executeUpdate();
             }
 
-            // === 3. LÉPÉS: Helyek frissítése (VÁLTOZATLAN) ===
+            // 3. Helyek frissítése
             try (PreparedStatement pstmtUpdateSeats = conn.prepareStatement(updateSeatsSql)) {
                 for (Seat seat : selectedSeats) {
                     pstmtUpdateSeats.setInt(1, vetitesId);
@@ -306,28 +292,21 @@ public class DatabaseManager {
             }
 
             conn.commit();
-            return true; // Siker
+            return true;
 
         } catch (SQLException e) {
             System.err.println("Hiba a foglalás mentésekor, tranzakció visszavonva: " + e.getMessage());
             try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (SQLException ex) {
-                System.err.println("Hiba a rollback közben: " + ex.getMessage());
-            }
-            return false; // Sikertelenség
-
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) { ex.printStackTrace(); }
+            return false;
         } finally {
             try {
                 if (conn != null) {
                     conn.setAutoCommit(true);
                     conn.close();
                 }
-            } catch (SQLException e) {
-                System.err.println("Hiba a kapcsolat lezárásakor: " + e.getMessage());
-            }
+            } catch (SQLException e) { e.printStackTrace(); }
         }
     }
 
@@ -340,57 +319,43 @@ public class DatabaseManager {
 
         Connection conn = this.connect();
         try {
-            conn.setAutoCommit(false); // Tranzakció indítása
+            conn.setAutoCommit(false);
 
             int filmId;
             int vetitesId;
 
-            // 1. Film beszúrása
-            try (PreparedStatement pstmtFilm = conn.prepareStatement(insertFilmSql, new String[]{"id"})) {
+            // FONTOS: Statement.RETURN_GENERATED_KEYS H2-höz
+            try (PreparedStatement pstmtFilm = conn.prepareStatement(insertFilmSql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmtFilm.setString(1, title);
                 pstmtFilm.setString(2, description);
                 pstmtFilm.setString(3, imageUrl);
                 pstmtFilm.executeUpdate();
-                filmId = getGeneratedId(pstmtFilm); // Segédmetódusunk használata
+                filmId = getGeneratedId(pstmtFilm);
             }
 
-            // 2. Vetítés beszúrása
-            try (PreparedStatement pstmtVetites = conn.prepareStatement(insertVetitesSql, new String[]{"id"})) {
+            try (PreparedStatement pstmtVetites = conn.prepareStatement(insertVetitesSql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmtVetites.setInt(1, filmId);
-                pstmtVetites.setString(2, date);   // Formátum: "YYYY-MM-DD"
-                pstmtVetites.setString(3, time);   // Formátum: "HH:mm"
+                pstmtVetites.setString(2, date);
+                pstmtVetites.setString(3, time);
                 pstmtVetites.setDouble(4, price);
                 pstmtVetites.executeUpdate();
                 vetitesId = getGeneratedId(pstmtVetites);
             }
 
-            // 3. Helyek generálása a vetítéshez
             try (PreparedStatement pstmtHely = conn.prepareStatement(insertHelyekSql)) {
-                // Hívjuk a meglévő segédmetódusunkat, ami már tudja, hogy 'FREE' helyeket kell csinálni
                 generateSeatsForShow(pstmtHely, vetitesId);
             }
 
-            conn.commit(); // Tranzakció véglegesítése
+            conn.commit();
             System.out.println("Új film és vetítés sikeresen mentve.");
             return true;
 
         } catch (SQLException e) {
-            System.err.println("Hiba az új film mentésekor, rollback: " + e.getMessage());
-            try {
-                conn.rollback();
-            } catch (SQLException ex) {
-                System.err.println("Hiba rollback közben: " + ex.getMessage());
-            }
+            System.err.println("Hiba az új film mentésekor: " + e.getMessage());
+            try { conn.rollback(); } catch (SQLException ex) {}
             return false;
         } finally {
-            try {
-                if (conn != null) {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                System.err.println("Hiba a kapcsolat lezárásakor: " + e.getMessage());
-            }
+            try { if (conn != null) { conn.setAutoCommit(true); conn.close(); } } catch (SQLException e) {}
         }
     }
 
@@ -401,88 +366,54 @@ public class DatabaseManager {
 
         Connection conn = this.connect();
         try {
-            conn.setAutoCommit(false); // Tranzakció indítása
+            conn.setAutoCommit(false);
 
-            // 1. Foglalások törlése
             try (PreparedStatement pstmt = conn.prepareStatement(deleteFoglalasok)) {
                 pstmt.setInt(1, vetitesId);
                 pstmt.executeUpdate();
             }
 
-            // 2. Helyek törlése
             try (PreparedStatement pstmt = conn.prepareStatement(deleteHelyek)) {
                 pstmt.setInt(1, vetitesId);
                 pstmt.executeUpdate();
             }
 
-            // 3. Maga a vetítés törlése
             try (PreparedStatement pstmt = conn.prepareStatement(deleteVetites)) {
                 pstmt.setInt(1, vetitesId);
                 int affectedRows = pstmt.executeUpdate();
-
-                if (affectedRows == 0) {
-                    throw new SQLException("Nem található a törlendő vetítés.");
-                }
+                if (affectedRows == 0) throw new SQLException("Nem található a törlendő vetítés.");
             }
 
             conn.commit();
             return true;
-
         } catch (SQLException e) {
-            System.err.println("Hiba a törlés során: " + e.getMessage());
-            try {
-                conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            try { conn.rollback(); } catch (SQLException ex) {}
             return false;
         } finally {
-            try {
-                if (conn != null) {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                }
-            } catch (SQLException e) {
-
-                e.printStackTrace();
-            }
+            try { if (conn != null) { conn.setAutoCommit(true); conn.close(); } } catch (SQLException e) {}
         }
     }
 
-
-    /**
-     * === ÚJ SEGÉDFÜGGVÉNY ===
-     * Megkeres egy felhasználót e-mail alapján, vagy létrehozza, ha nem létezik.
-     * @param conn Aktív adatbázis-kapcsolat (tranzakción belül!)
-     * @param name A felhasználó neve
-     * @param email A felhasználó e-mail címe
-     * @return A felhasználó (meglévő vagy új) ID-ja
-     * @throws SQLException Hiba esetén kivételt dob
-     */
     private int getOrCreateUser(Connection conn, String name, String email) throws SQLException {
-        // 1. Megpróbáljuk lekérdezni az e-mail alapján
         String selectSql = "SELECT id FROM Felhasznalok WHERE email = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(selectSql)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                // Ha megvan, visszaadjuk az ID-ját
                 return rs.getInt("id");
             }
         }
 
-        // 2. Ha nem találtuk meg, létrehozzuk az új felhasználót
         String insertSql = "INSERT INTO Felhasznalok(nev, email) VALUES(?, ?)";
-        // A Statement.RETURN_GENERATED_KEYS kell, hogy visszakapjuk az új ID-t
+        // FONTOS: RETURN_GENERATED_KEYS H2-höz
         try (PreparedStatement pstmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, name);
             pstmt.setString(2, email);
             pstmt.executeUpdate();
 
-            // Kérjük el az auto-generált ID-t
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1); // Visszaadjuk az új ID-t
+                    return generatedKeys.getInt(1);
                 } else {
                     throw new SQLException("Nem sikerült létrehozni a felhasználót, nincs ID.");
                 }

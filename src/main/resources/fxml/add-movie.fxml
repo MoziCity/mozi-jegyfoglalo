@@ -46,7 +46,13 @@
                             </padding>
 
                             <Label text="Film címe:" styleClass="legend-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                            <TextField fx:id="titleField" promptText="pl. A Keresztapa" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="400"/>
+
+                            <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                                <children>
+                                    <TextField fx:id="titleField" promptText="pl. Inception" prefWidth="300"/>
+                                    <Button text="Adatok letöltése" onAction="#handleAutoFill" style="-fx-font-size: 11px; -fx-background-color: #2196F3; -fx-text-fill: white; -fx-cursor: hand;"/>
+                                </children>
+                            </HBox>
 
                             <Label text="Leírás:" styleClass="legend-label" GridPane.rowIndex="1" GridPane.columnIndex="0" alignment="TOP_LEFT"/>
                             <TextArea fx:id="descriptionArea" promptText="A film rövid leírása..." wrapText="true" prefHeight="100" GridPane.rowIndex="1" GridPane.columnIndex="1"/>

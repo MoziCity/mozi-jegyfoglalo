@@ -12,6 +12,9 @@ import javafx.scene.paint.Color;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import com.MoziCity.mozi_jegyfoglalo.service.OmdbService;
+import javafx.application.Platform;
+
 public class AddMovieController {
 
     @FXML private TextField titleField;
@@ -35,9 +38,53 @@ public class AddMovieController {
         this.mainApp = mainApp;
     }
 
-    // JAVÍTOTT METÓDUSOK
-    // Az alábbi két metódus a logikát tartalmazza.
-    // Az üres, ActionEvent paraméterrel rendelkező metódusokat töröltem, hogy ne legyen duplikáció.
+    @FXML
+    private void handleAutoFill() {
+        String title = titleField.getText();
+
+        // Ellenőrzés: írt-e be valamit?
+        if (title == null || title.trim().isEmpty()) {
+            showError("Kérlek, írd be a film címét a kereséshez!");
+            return;
+        }
+
+        // Jelezzük a felhasználónak, hogy dolgozunk
+        statusLabel.setTextFill(Color.YELLOW);
+        statusLabel.setText("Keresés az adatbázisban...");
+
+        // Külön szálon futtatjuk a letöltést, hogy ne fagyjon le a program
+        new Thread(() -> {
+            // Itt hívjuk meg az OmdbService-t, amit az előbb hoztál létre
+            OmdbService.MovieData data = OmdbService.searchMovieByTitle(title);
+
+            // Visszatérünk a főszálra (UI frissítése)
+            Platform.runLater(() -> {
+                if (data != null) {
+                    // Ha sikeres, kitöltjük a mezőket
+
+                    // Csak akkor írjuk felül, ha üres a mező (vagy ha akarod, mindig felülírhatod)
+                    if (descriptionArea.getText().isEmpty()) {
+                        descriptionArea.setText(data.description);
+                    } else {
+                        // Opcionális: rákérdezhetsz, de most egyszerűsítsünk: felülírjuk
+                        descriptionArea.setText(data.description);
+                    }
+
+                    if (imageUrlField.getText().isEmpty()) {
+                        imageUrlField.setText(data.imageUrl);
+                    } else {
+                        imageUrlField.setText(data.imageUrl);
+                    }
+
+                    showSuccess("Adatok sikeresen letöltve!");
+                } else {
+                    showError("Nem található film ezzel a címmel (vagy hiba történt).");
+                }
+            });
+        }).start();
+    }
+
+
     @FXML
     private void handleSave() {
         String title = titleField.getText();
