@@ -51,7 +51,9 @@ public class ConfirmationController {
 
         updateBookingDetails();
     }
-
+    public void setDbManager(DatabaseManager dbManager) {
+        this.dbManager = dbManager;
+    }
     private void updateBookingDetails() {
         movieTitleLabel.setText(movie.getTitle());
 
@@ -73,7 +75,7 @@ public class ConfirmationController {
     }
 
     @FXML
-    private void handleConfirm() {
+    public void handleConfirm() {
 
         // 1. Adatok lekérése és validálása
         String customerName = nameTextField.getText().trim();
