@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Új Film</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<div class="confirmation-box" style="max-width: 500px; margin: 50px auto; padding: 20px;">
+    <h1>Új film hozzáadása</h1>
+    <form action="/add-movie" method="post" style="display: flex; flex-direction: column; gap: 10px;">
+        <input type="text" name="title" placeholder="Film címe" required>
+        <textarea name="description" placeholder="Leírás" required></textarea>
+        <input type="text" name="imageUrl" placeholder="Kép URL (pl. /images/film1.jpg)" required>
+        <input type="text" name="date" placeholder="Dátum (yyyy-MM-dd)" value="2025-11-20" required>
+        <input type="text" name="time" placeholder="Idő (HH:mm)" value="18:00" required>
+        <input type="number" name="price" placeholder="Jegyár (Ft)" value="2500" required>
+        <button class="action-button" type="submit">Hozzáadás</button>
+    </form>
+    <br>
+    <a href="/" style="color: white;">Mégse</a>
+</div>
+</body>
+</html>

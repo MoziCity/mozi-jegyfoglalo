@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Helyválasztás</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    /* Helyek rács stílusa */
+    .seat-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr); /* 8 oszlop */
+      gap: 10px;
+      max-width: 400px;
+      margin: 20px auto;
+    }
+    .seat-checkbox { display: none; } /* Elrejtjük a jelölőnégyzetet */
+    .seat-label {
+      display: block; padding: 10px; text-align: center;
+      background-color: #4CAF50; color: white; border-radius: 5px; cursor: pointer;
+    }
+    /* Ha foglalt */
+    .seat-taken { background-color: #ff4444; cursor: not-allowed; opacity: 0.6; }
+    /* Ha ki van pipálva (kiválasztva) */
+    .seat-checkbox:checked + .seat-label { background-color: #FFD700; color: black; border: 2px solid white; }
+  </style>
+</head>
+<body>
+<div style="text-align: center;">
+  <h1>Válasszon helyet</h1>
+  <div style="background: #333; color: white; padding: 10px; margin-bottom: 20px;">VÁSZON</div>
+
+  <form action="/megerosites" method="post">
+    <input type="hidden" name="vetitesId" th:value="${vetitesId}">
+
+    <div class="seat-grid">
+      <div th:each="seat : ${seats}">
+        <div th:if="${seat.status.name() == 'TAKEN'}" class="seat-label seat-taken">
+          <span th:text="${seat.row + seat.number}">A1</span>
+        </div>
+
+        <div th:if="${seat.status.name() == 'FREE'}">
+          <input type="checkbox" name="selectedSeats"
+                 th:value="${seat.row + seat.number}"
+                 th:id="${'seat-' + seat.row + seat.number}"
+                 class="seat-checkbox">
+          <label th:for="${'seat-' + seat.row + seat.number}" class="seat-label"
+                 th:text="${seat.row + seat.number}">A1</label>
+        </div>
+      </div>
+    </div>
+    <br>
+    <button class="action-button" type="submit">Tovább a megerősítéshez</button>
+  </form>
+</div>
+</body>
+</html>

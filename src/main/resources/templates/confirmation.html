@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Megerősítés</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<div class="confirmation-box" style="max-width: 500px; margin: 20px auto;">
+    <h1>Foglalás megerősítése</h1>
+    <p><strong>Választott helyek:</strong> <span th:text="${seatString}"></span></p>
+    <p><strong>Fizetendő:</strong> <span th:text="${totalPrice} + ' Ft'" style="color: #4CAF50; font-size: 1.2em;"></span></p>
+
+    <form action="/mentes" method="post">
+        <input type="hidden" name="vetitesId" th:value="${vetitesId}">
+        <input type="hidden" name="seatString" th:value="${seatString}">
+        <input type="hidden" name="totalPrice" th:value="${totalPrice}">
+
+        <div style="margin-bottom: 10px;">
+            <label>Név:</label><br>
+            <input type="text" name="name" placeholder="Gipsz Jakab" required style="width: 100%;">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label>E-mail:</label><br>
+            <input type="email" name="email" placeholder="pelda@email.com" required style="width: 100%;">
+        </div>
+
+        <button class="action-button" type="submit">Foglalás véglegesítése</button>
+    </form>
+</div>
+</body>
+</html>
