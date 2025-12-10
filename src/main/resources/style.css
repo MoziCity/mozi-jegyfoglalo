@@ -188,4 +188,79 @@
     -fx-effect: dropshadow(gaussian, #00e5ff, 5, 0.4, 0, 0);
 }
 
+/* --- style.css --- */
+
+/* 1. Az ALAP gomb stílushoz adjuk hozzá a fehér színt és a középre igazítást */
+.seat-button {
+    -fx-background-radius: 8;
+    -fx-background-insets: 2;
+    -fx-font-size: 13px; /* Kicsit vegyük kisebbre, hogy biztosan kiférjen */
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 2, 0, 0, 1);
+    -fx-min-width: 55px;
+    -fx-min-height: 40px;
+
+    /* EZ HIÁNYZOTT: */
+    -fx-text-fill: white;  /* Fehér szöveg */
+    -fx-alignment: center; /* Középre igazítás */
+}
+
+/* 2. SZABAD szék */
+.seat-free {
+    -fx-background-color: #0cae07;
+    -fx-text-fill: #ffffff; /* Itt is legyen fehér */
+    -fx-border-color: #555555;
+    -fx-border-radius: 8;
+}
+
+.seat-free:hover {
+    -fx-background-color: #505050;
+    -fx-border-color: #aaaaaa;
+}
+
+/* 3. KIVÁLASZTOTT szék */
+.seat-selected {
+    -fx-background-color: #eaff00;
+    -fx-text-fill: #000000; /* Fehér szöveg zöld háttéren */
+    -fx-border-color: #2E7D32;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(76, 175, 80, 0.6), 10, 0, 0, 0);
+}
+
+/* 4. FOGLALT szék */
+.seat-taken {
+    -fx-background-color: #535353;
+    -fx-text-fill: #ffdddd; /* Halvány rózsaszín/fehér, hogy olvasható legyen a piroson */
+    -fx-opacity: 0.8;       /* Kicsit növeltem az átlátszatlanságot, hogy jobban látszódjon a szöveg */
+    -fx-cursor: default;
+}
+
+/* --- style.css --- */
+
+/* A VÁSZON CSÍKJA */
+.screen-shape {
+    /* 1. Teljesen fehér szín */
+    -fx-background-color: #FFFFFF;
+
+    /* 2. Erős fehér ragyogás (DropShadow) */
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 255, 255, 0.8), 15, 0.5, 0, 0);
+
+    /* 3. Vékonyabb és lekerekített */
+    -fx-background-radius: 5;
+    -fx-min-height: 4px;  /* Vékony csík */
+    -fx-max-height: 4px;
+
+    /* Szélesség - legyen szélesebb, mint a székek */
+    -fx-pref-width: 700px;
+}
+
+/* A "VÁSZON" felirat */
+.screen-text {
+    -fx-text-fill: #e0e0e0; /* Világosszürke */
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 3px; /* Ritkított betűk */
+    -fx-opacity: 0.8;
+}
 

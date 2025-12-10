@@ -78,9 +78,12 @@ public class SeatSelectionController {
 
         for (Seat seat : seats) {
             Button seatButton = new Button(seat.getSeatId());
-            seatButton.setPrefSize(80, 50); // <--- EZT A SORT MÓDOSÍTSD
-            seatButton.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
-            seatButton.setMaxSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
+
+            // --- MÓDOSÍTÁS KEZDTE ---
+            // Töröltük a fix setPrefSize(80, 50)-et!
+            // Helyette rábízzuk a CSS-re (.seat-button osztály)
+            seatButton.getStyleClass().add("seat-button");
+            // --- MÓDOSÍTÁS VÉGE ---
 
             updateSeatButtonStyle(seatButton, seat);
 
@@ -93,7 +96,14 @@ public class SeatSelectionController {
     }
 
     private void updateSeatButtonStyle(Button button, Seat seat) {
+        // Először töröljük a státusz-specifikus osztályokat
         button.getStyleClass().removeAll("seat-free", "seat-selected", "seat-taken");
+
+        // Biztosítjuk, hogy az alap "seat-button" rajta maradjon
+        if (!button.getStyleClass().contains("seat-button")) {
+            button.getStyleClass().add("seat-button");
+        }
+
         switch (seat.getStatus()) {
             case FREE:
                 button.getStyleClass().add("seat-free");
@@ -105,7 +115,7 @@ public class SeatSelectionController {
                 break;
             case TAKEN:
                 button.getStyleClass().add("seat-taken");
-                button.setDisable(true);
+                button.setDisable(true); // A foglalt szék nem kattintható
                 break;
         }
     }
