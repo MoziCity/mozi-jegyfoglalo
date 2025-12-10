@@ -9,6 +9,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 
+import com.MoziCity.mozi_jegyfoglalo.model.CartItem;
+import com.MoziCity.mozi_jegyfoglalo.service.CartService;
+
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,8 @@ public class SeatSelectionController {
     private Movie movie;
     private List<Seat> seats;
     private List<Seat> selectedSeats;
+
+    private CartService cartService = new CartService();
 
     @FXML
     public void initialize() {
@@ -133,6 +138,21 @@ public class SeatSelectionController {
     @FXML
     private void handleContinue() {
         if (!selectedSeats.isEmpty()) {
+            cartService.clearCart();
+
+            for (Seat seat : selectedSeats) {
+                cartService.addToCart(
+                        new CartItem(
+                                movie.getTitle(),
+                                seat.getSeatId(),
+                                2500
+                        )
+                );
+            }
+            System.out.println("Kosár tartalma:");
+            System.out.println("Tételek száma: " + cartService.getItemCount());
+            System.out.println("Végösszeg: " + cartService.getTotalPrice() + " Ft");
+
             mainApp.showConfirmationScene(movie, selectedSeats);
         }
     }
