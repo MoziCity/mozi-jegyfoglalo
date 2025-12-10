@@ -1,4 +1,5 @@
 package com.MoziCity.mozi_jegyfoglalo.controller;
+import com.MoziCity.mozi_jegyfoglalo.db.DatabaseManager;
 
 import com.MoziCity.mozi_jegyfoglalo.MainApp;
 import com.MoziCity.mozi_jegyfoglalo.model.Movie;
@@ -31,8 +32,8 @@ public class SeatSelectionController {
 
     private MainApp mainApp;
     private Movie movie;
-    private List<Seat> seats;
     private List<Seat> selectedSeats;
+    private DatabaseManager dbManager;
 
     private CartService cartService = new CartService();
 
@@ -40,6 +41,20 @@ public class SeatSelectionController {
     public void initialize() {
         selectedSeats = new ArrayList<>();
         continueButton.setDisable(true);
+        dbManager = new DatabaseManager();
+    }
+    @FXML
+    private void handleRefresh() {
+        loadMovies();
+    }
+
+    private void loadMovies() {
+    }
+
+    // EZ AZ ÚJ METÓDUS
+    @FXML
+    private void handleAddNewMovie() {
+        mainApp.showAddMovieScene();
     }
 
     public void setMainApp(MainApp mainApp) {
@@ -59,46 +74,41 @@ public class SeatSelectionController {
     }
 
     private void loadSeats() {
-        seats = new ArrayList<>();
-        for (char row = 'A'; row <= 'H'; row++) {
-            for (int number = 1; number <= 10; number++) {
-                SeatStatus status = Math.random() < 0.2 ? SeatStatus.TAKEN : SeatStatus.FREE;
-                seats.add(new Seat(String.valueOf(row), number, status));
-            }
-        }
-        displaySeats();
+        List<Seat> seats = dbManager.getSeatsForShow(movie.getVetitesId());
+        displaySeats(seats);
     }
 
-    private void displaySeats() {
+    private void displaySeats(List<Seat> seats) {
         seatsGridPane.getChildren().clear();
+
         for (Seat seat : seats) {
-            // 1. LÉPÉS: Összeállítjuk a szöveget
-            String seatLabelText = seat.getRow() + seat.getNumber();
+            Button seatButton = new Button(seat.getSeatId());
 
-            // 2. LÉPÉS: DEBUG - Kiírjuk a konzolra, mi a szöveg
-            // Futtasd a programot, és nézd meg a konzolt (a kimeneti ablakot az IDE-ben).
-            // Itt látnod kell, hogy "A1", "A2" stb. szövegek jönnek-e létre.
-            System.out.println("DEBUG: Creating button with text: " + seatLabelText);
-
-            // 3. LÉPÉS: Létrehozzuk a gombot a szöveggel
-            Button seatButton = new Button(seatLabelText);
-
-            // 4. LÉPÉS: Beállítjuk a méretet - NÖVELTÜK a méretet, hogy biztosan elférjen a szöveg
-            seatButton.setPrefSize(50, 50); // Méret növelése 40x50-ről 50x50-re
-            seatButton.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE); // Ne legyen kisebb a beállított méretnél
-            seatButton.setMaxSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE); // Ne legyen nagyobb a beállított méretnél
+            // --- MÓDOSÍTÁS KEZDTE ---
+            // Töröltük a fix setPrefSize(80, 50)-et!
+            // Helyette rábízzuk a CSS-re (.seat-button osztály)
+            seatButton.getStyleClass().add("seat-button");
+            // --- MÓDOSÍTÁS VÉGE ---
 
             updateSeatButtonStyle(seatButton, seat);
+
             seatButton.setOnAction(e -> handleSeatClick(seat, seatButton));
 
-            int rowIndex = seat.getRow().charAt(0) - 'A';
-            int colIndex = seat.getNumber() - 1;
-            seatsGridPane.add(seatButton, colIndex, rowIndex);
+            int row = seat.getRow().charAt(0) - 'A';
+            int col = seat.getNumber() - 1;
+            seatsGridPane.add(seatButton, col, row);
         }
     }
 
     private void updateSeatButtonStyle(Button button, Seat seat) {
+        // Először töröljük a státusz-specifikus osztályokat
         button.getStyleClass().removeAll("seat-free", "seat-selected", "seat-taken");
+
+        // Biztosítjuk, hogy az alap "seat-button" rajta maradjon
+        if (!button.getStyleClass().contains("seat-button")) {
+            button.getStyleClass().add("seat-button");
+        }
+
         switch (seat.getStatus()) {
             case FREE:
                 button.getStyleClass().add("seat-free");
@@ -110,7 +120,7 @@ public class SeatSelectionController {
                 break;
             case TAKEN:
                 button.getStyleClass().add("seat-taken");
-                button.setDisable(true);
+                button.setDisable(true); // A foglalt szék nem kattintható
                 break;
         }
     }

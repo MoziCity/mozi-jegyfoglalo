@@ -2,62 +2,68 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<!-- EZ AZ ÚJ GYÖKÉR ELEM: Középre igazítja a tartalmat és fix méretet ad neki -->
-<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.MoziCity.mozi_jegyfoglalo.controller.MovieSelectionController">
+<BorderPane styleClass="main-background" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.MoziCity.mozi_jegyfoglalo.controller.MovieSelectionController">
 
-    <children>
-        <!-- Az eredeti BorderPane, maximális mérettel korlátozva -->
-        <BorderPane maxWidth="1920" maxHeight="1080" style="-fx-background-color: #1a1a1a;">
-            <top>
-                <VBox alignment="CENTER" styleClass="header" BorderPane.alignment="CENTER">
+    <top>
+        <VBox alignment="CENTER" styleClass="header" BorderPane.alignment="CENTER">
+            <children>
+
+                <HBox alignment="CENTER_RIGHT" style="-fx-padding: 0 20 0 0;">
+                    <Button onAction="#handleAdminLogin" style="-fx-font-size: 10px;" text="Admin belépés" />
+                </HBox>
+
+                <Label text="MoziCity Jegyfoglaló" />
+                <Label style="-fx-font-size: 16px; -fx-font-weight: 400;" text="Válasszon filmet a vetítéshez" />
+
+                <HBox alignment="CENTER" spacing="15" style="-fx-padding: 15 0 0 0;">
                     <children>
-                        <Label text="MoziCity Jegyfoglaló" textFill="WHITE">
-                            <font>
-                                <Font name="System Bold" size="24.0" />
-                            </font>
-                        </Label>
-                        <Label text="Válasszon filmet a vetítéshez" textFill="#e0e0e0">
-                            <font>
-                                <Font size="16.0" />
-                            </font>
-                        </Label>
+                        <TextField fx:id="searchField" prefWidth="250" promptText="Keresés cím alapján..." />
+
+                        <DatePicker fx:id="filterDatePicker" prefWidth="150" promptText="Dátum szűrés" />
+
+                        <Button onAction="#handleClearFilters" style="-fx-background-color: #555; -fx-text-fill: white;" text="X" />
                     </children>
-                    <padding>
-                        <Insets bottom="20.0" top="20.0" />
-                    </padding>
-                </VBox>
-            </top>
-            <center>
-                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" BorderPane.alignment="CENTER">
-                    <content>
-                        <FlowPane fx:id="moviesFlowPane" hgap="20.0" vgap="20.0">
-                            <padding>
-                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                            </padding>
-                        </FlowPane>
-                    </content>
-                </ScrollPane>
-            </center>
-            <bottom>
-                <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="20.0" top="10.0" />
+            </padding>
+        </VBox>
+    </top>
+
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: transparent; -fx-background-color: transparent;" BorderPane.alignment="CENTER">
+            <content>
+                <FlowPane fx:id="moviesFlowPane" hgap="20.0" styleClass="glass-panel" vgap="20.0">
                     <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
-                    <children>
-                        <Button mnemonicParsing="false" onAction="#handleRefresh" text="Frissítés" />
-                    </children>
-                </HBox>
-            </bottom>
-        </BorderPane>
-    </children>
-</StackPane>
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="20" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+                <Button mnemonicParsing="false" onAction="#handleRefresh" text="Frissítés" />
+
+                <Button fx:id="addMovieButton" managed="false" mnemonicParsing="false" onAction="#handleAddNewMovie" styleClass="action-button" text="Új film hozzáadása" visible="false" />
+            </children>
+        </HBox>
+    </bottom>
+
+</BorderPane>
