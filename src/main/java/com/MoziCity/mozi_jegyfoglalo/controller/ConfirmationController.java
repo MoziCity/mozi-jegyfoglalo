@@ -75,7 +75,7 @@ public class ConfirmationController {
     @FXML
     private void handleConfirm() {
 
-        // 1. Adatok lekérése és validálása
+
         String customerName = nameTextField.getText().trim();
         String customerEmail = emailTextField.getText().trim();
 
@@ -84,7 +84,7 @@ public class ConfirmationController {
             return; // Megállítjuk a folyamatot
         }
 
-        // Alapvető e-mail validáció
+
         if (customerEmail.isEmpty() || !customerEmail.contains("@") || !customerEmail.contains(".")) {
             mainApp.showError("Érvénytelen adat", "Kérjük, adjon meg egy érvényes e-mail címet!");
             return; // Megállítjuk a folyamatot
@@ -92,13 +92,11 @@ public class ConfirmationController {
 
         int totalPrice = movie.getPrice() * selectedSeats.size();
 
-        // 2. Megpróbáljuk elmenteni a foglalást az adatbázisba
-        // FIGYELEM: Ehhez módosítanod kell a DatabaseManager.java-t!
-        // (A metódus aláírását, hogy fogadja a nevet és emailt)
+
         boolean success = dbManager.saveBooking(movie.getVetitesId(), selectedSeats, totalPrice, customerName, customerEmail);
 
         if (success) {
-            // 3. SIKERES MENTÉS ESETÉN (Üzenet kiegészítve a névvel)
+
             String seatsText = selectedSeats.stream().map(Seat::getSeatId).collect(Collectors.joining(", "));
             mainApp.showInfo("Sikeres foglalás",
                     "Köszönjük a foglalását, " + customerName + "!\n" + // Név hozzáadva
@@ -108,11 +106,11 @@ public class ConfirmationController {
                             "Helyek: " + seatsText + "\n" +
                             "Összesen: " + totalPrice + " Ft");
 
-            // Vissza a filmválasztó képernyőre
+
             mainApp.showMovieSelectionScene();
 
         } else {
-            // 4. SIKERTELEN MENTÉS ESETÉN
+
             mainApp.showError("Foglalási hiba",
                     "Sajnos hiba történt a foglalás mentése közben. Kérjük, próbálja újra később.");
         }

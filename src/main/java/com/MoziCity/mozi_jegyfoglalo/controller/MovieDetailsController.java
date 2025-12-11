@@ -38,7 +38,7 @@ public class MovieDetailsController {
 
             priceLabel.setText(movie.getPrice() + " Ft");
 
-            // Kép betöltése
+
             try {
                 Image image = new Image(movie.getImageUrl(), true);
                 posterImageView.setImage(image);

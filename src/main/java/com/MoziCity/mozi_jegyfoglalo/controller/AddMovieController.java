@@ -42,31 +42,29 @@ public class AddMovieController {
     private void handleAutoFill() {
         String title = titleField.getText();
 
-        // Ellenőrzés: írt-e be valamit?
+
         if (title == null || title.trim().isEmpty()) {
             showError("Kérlek, írd be a film címét a kereséshez!");
             return;
         }
 
-        // Jelezzük a felhasználónak, hogy dolgozunk
+
         statusLabel.setTextFill(Color.YELLOW);
         statusLabel.setText("Keresés az adatbázisban...");
 
-        // Külön szálon futtatjuk a letöltést, hogy ne fagyjon le a program
+
         new Thread(() -> {
-            // Itt hívjuk meg az OmdbService-t, amit az előbb hoztál létre
+
             OmdbService.MovieData data = OmdbService.searchMovieByTitle(title);
 
-            // Visszatérünk a főszálra (UI frissítése)
+
             Platform.runLater(() -> {
                 if (data != null) {
-                    // Ha sikeres, kitöltjük a mezőket
 
-                    // Csak akkor írjuk felül, ha üres a mező (vagy ha akarod, mindig felülírhatod)
                     if (descriptionArea.getText().isEmpty()) {
                         descriptionArea.setText(data.description);
                     } else {
-                        // Opcionális: rákérdezhetsz, de most egyszerűsítsünk: felülírjuk
+
                         descriptionArea.setText(data.description);
                     }
 

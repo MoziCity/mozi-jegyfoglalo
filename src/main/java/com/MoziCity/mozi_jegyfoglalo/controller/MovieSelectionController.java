@@ -35,7 +35,7 @@ public class MovieSelectionController {
     private DatabaseManager dbManager;
     private MainApp mainApp;
 
-    // Admin állapot követése
+
     private boolean adminMode = false;
 
     private List<Movie> allMovies = new ArrayList<>();
@@ -47,7 +47,7 @@ public class MovieSelectionController {
             applyFilters();
         });
 
-        // Figyeljük a dátumválasztót is
+
         filterDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             applyFilters();
         });
@@ -60,7 +60,7 @@ public class MovieSelectionController {
 
 
 
-    // === Eseménykezelők ===
+
 
     @FXML
     private void handleAdminLogin() {
@@ -71,7 +71,7 @@ public class MovieSelectionController {
             addMovieButton.setManaged(false);
             mainApp.showInfo("Admin", "Sikeres kijelentkezés.");
         } else {
-            // Jelszó bekérése
+
             TextInputDialog dialog = new TextInputDialog("");
             dialog.setTitle("Admin Belépés");
             dialog.setHeaderText("Kérjük, adja meg az admin jelszót:");
@@ -89,7 +89,7 @@ public class MovieSelectionController {
                 }
             }
         }
-        // Filmek újratöltése, hogy a Törlés gombok megjelenjenek/eltűnjenek
+
         loadMovies();
     }
 
@@ -110,7 +110,7 @@ public class MovieSelectionController {
     }
 
     private void handleDeleteMovie(Movie movie) {
-        // Megerősítés kérése
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Törlés megerősítése");
         alert.setHeaderText("Biztosan törölni szeretné ezt a vetítést?");
@@ -118,7 +118,7 @@ public class MovieSelectionController {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            // Törlés az adatbázisból
+
             boolean success = dbManager.deleteShowtime(movie.getVetitesId());
             if (success) {
                 loadMovies(); // Lista frissítése
@@ -129,7 +129,7 @@ public class MovieSelectionController {
         }
     }
 
-    // === Privát segédmetódusok ===
+
 
     private void loadMovies() {
         allMovies = dbManager.getAllMovies();
@@ -142,13 +142,13 @@ public class MovieSelectionController {
 
         List<Movie> filteredList = allMovies.stream()
                 .filter(movie -> {
-                    // 1. Cím szűrése (ha van beírva szöveg)
+
                     boolean matchesTitle = true;
                     if (!searchText.isEmpty()) {
                         matchesTitle = movie.getTitle().toLowerCase().contains(searchText);
                     }
 
-                    // 2. Dátum szűrése (ha van kiválasztva dátum)
+
                     boolean matchesDate = true;
                     if (selectedDate != null) {
                         // A LocalDateTime-ból kivesszük a LocalDate részt az összehasonlításhoz
@@ -206,11 +206,11 @@ public class MovieSelectionController {
         Label priceLabel = new Label(movie.getPrice() + " Ft");
         priceLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold;");
 
-        // Gombok tárolója
+
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
 
-        // Kiválasztás gomb (Mindig látszik)
+
         Button selectButton = new Button("Kiválasztás");
         selectButton.getStyleClass().add("select-button");
         selectButton.setOnAction(e -> {
@@ -223,7 +223,7 @@ public class MovieSelectionController {
         });
         buttonBox.getChildren().add(selectButton);
 
-        // Törlés gomb (CSAK HA ADMIN)
+
         if (adminMode) {
             Button deleteButton = new Button("Törlés");
             deleteButton.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-cursor: hand;");
