@@ -19,7 +19,7 @@ public class DatabaseManagerTest {
 
     @BeforeAll
     static void setup() {
-        // Inicializáljuk az adatbázis kapcsolatot
+
         dbManager = new DatabaseManager();
         dbManager.setupDatabase();
     }
@@ -28,7 +28,7 @@ public class DatabaseManagerTest {
     @Order(1)
     @DisplayName("Új film és vetítés hozzáadása teszt")
     void testAddNewMovie() {
-        // 1. Lépés: Új film hozzáadása
+
         boolean result = dbManager.addNewMovieAndShowtime(
                 "TESZT FILM",
                 "Ez egy teszt leírás",
@@ -40,7 +40,7 @@ public class DatabaseManagerTest {
 
         assertTrue(result, "A film mentésének sikeresnek kell lennie.");
 
-        // 2. Lépés: Ellenőrizzük, hogy bekerült-e az adatbázisba
+
         List<Movie> movies = dbManager.getAllMovies();
         testMovie = movies.stream()
                 .filter(m -> m.getTitle().equals("TESZT FILM"))
@@ -57,13 +57,13 @@ public class DatabaseManagerTest {
     void testSeatGeneration() {
         assertNotNull(testMovie, "A teszt filmnek léteznie kell az előző tesztből.");
 
-        // Lekérjük a helyeket a létrehozott vetítéshez
+
         List<Seat> seats = dbManager.getSeatsForShow(testMovie.getVetitesId());
 
-        // Ellenőrizzük, hogy nem üres a lista (az adatbázis generálta őket)
+
         assertFalse(seats.isEmpty(), "A helyek listája nem lehet üres.");
 
-        // Ellenőrizzük, hogy minden hely alapértelmezetten SZABAD
+
         boolean allFree = seats.stream().allMatch(s -> s.getStatus() == SeatStatus.FREE);
         assertTrue(allFree, "Minden helynek kezdetben szabadnak kell lennie.");
     }
@@ -74,14 +74,14 @@ public class DatabaseManagerTest {
     void testBooking() {
         assertNotNull(testMovie, "A teszt filmnek léteznie kell.");
 
-        // Kiválasztunk 2 helyet foglalásra (Pl. A1, A2)
+
         List<Seat> seatsToBook = new ArrayList<>();
         seatsToBook.add(new Seat("A", 1, SeatStatus.SELECTED));
         seatsToBook.add(new Seat("A", 2, SeatStatus.SELECTED));
 
         int totalPrice = testMovie.getPrice() * seatsToBook.size();
 
-        // Mentjük a foglalást
+
         boolean success = dbManager.saveBooking(
                 testMovie.getVetitesId(),
                 seatsToBook,
@@ -92,7 +92,7 @@ public class DatabaseManagerTest {
 
         assertTrue(success, "A foglalás mentésének sikeresnek kell lennie.");
 
-        // ELLENŐRZÉS: Visszaolvassuk a helyeket, és megnézzük, hogy FOGLALT-e
+
         List<Seat> updatedSeats = dbManager.getSeatsForShow(testMovie.getVetitesId());
 
         Seat bookedSeat1 = updatedSeats.stream()
@@ -112,7 +112,7 @@ public class DatabaseManagerTest {
         boolean deleted = dbManager.deleteShowtime(testMovie.getVetitesId());
         assertTrue(deleted, "A törlésnek sikeresnek kell lennie.");
 
-        // Ellenőrzés: már nem szabad megtalálni
+
         List<Movie> movies = dbManager.getAllMovies();
         boolean exists = movies.stream().anyMatch(m -> m.getVetitesId() == testMovie.getVetitesId());
 

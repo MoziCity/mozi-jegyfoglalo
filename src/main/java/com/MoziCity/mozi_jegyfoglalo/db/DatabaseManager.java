@@ -14,19 +14,15 @@ import org.h2.tools.Server;
 
 public class DatabaseManager {
 
-    // --- H2 BEÁLLÍTÁSOK ---
-    // A ./mozi_db azt jelenti, hogy a projekt mappájában hozza létre a fájlt.
-    // Az AUTO_SERVER=TRUE teszi lehetővé, hogy futás közben te is megnyisd (pl. IntelliJ-ből).
+
     private static final String DB_URL = "jdbc:h2:./mozi_db;AUTO_SERVER=TRUE";
     private static final String DB_USER = "sa";
     private static final String DB_PASS = "";
 
-    // Formátum a LocalDateTime tárolásához
+
     private final DateTimeFormatter dbFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    /**
-     * Csatlakozik a H2 adatbázishoz.
-     */
+
     private Connection connect() {
         Connection conn = null;
         try {
@@ -37,12 +33,9 @@ public class DatabaseManager {
         return conn;
     }
 
-    /**
-     * Létrehozza a sémát H2 szintaxissal.
-     */
     public void setupDatabase() {
         try {
-            // Ez indítja el a webes felületet a 8082-es porton
+
             Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8081").start();
             System.out.println("H2 Web Konzol elindítva: http://localhost:8081");
         } catch (SQLException e) {
@@ -100,7 +93,7 @@ public class DatabaseManager {
             stmt.execute(createHelyekTable);
             stmt.execute(createFoglalasokTable);
 
-            // Adatok feltöltése, ha üres
+
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Filmek");
             rs.next();
             if (rs.getInt(1) == 0) {
@@ -108,7 +101,7 @@ public class DatabaseManager {
                 populateDummyData(conn);
             }
 
-            // Kiírjuk a konzolra az elérési adatokat
+
             System.out.println("--- H2 ADATBÁZIS ELINDULT ---");
             System.out.println("URL: " + DB_URL);
             System.out.println("User: sa");
@@ -121,7 +114,7 @@ public class DatabaseManager {
     }
 
     private void populateDummyData(Connection conn) throws SQLException {
-        // H2-nél Statement.RETURN_GENERATED_KEYS-t használunk az ID visszakéréséhez
+
 
         String insertFilm = "INSERT INTO Filmek (cim, leiras, imageUrl) VALUES (?,?,?)";
         String insertVetites = "INSERT INTO Vetitesek (film_id, datum, idopont, jegyar) VALUES (?,?,?,?)";
@@ -133,7 +126,7 @@ public class DatabaseManager {
 
             conn.setAutoCommit(false);
 
-            // === Borat ===
+
             pstmtFilm.setString(1, "Borat");
             pstmtFilm.setString(2, "A Borat: Kazah nép nagy fehér gyermeke Amerikába megy.");
             pstmtFilm.setString(3, "https://m.media-amazon.com/images/M/MV5BMTk0MTQ3NDQ4Ml5BMl5BanBnXkFtZTcwOTQ3OTQzMw@@._V1_SX300.jpg");
@@ -148,7 +141,7 @@ public class DatabaseManager {
             int boratVetitesId = getGeneratedId(pstmtVetites);
             generateSeatsForShow(pstmtHely, boratVetitesId);
 
-            // === K-pop démonvadászok ===
+
             pstmtFilm.setString(1, "K-pop démonvadászok");
             pstmtFilm.setString(2, "A K-pop démonvadászok 2025-ben bemutatott amerikai animációs film.");
             pstmtFilm.setString(3, "https://image.tmdb.org/t/p/w500/qhb1qOilapbapxWQn9jtRCMwXJF.jpg");
@@ -163,7 +156,7 @@ public class DatabaseManager {
             int kpopVetitesId = getGeneratedId(pstmtVetites);
             generateSeatsForShow(pstmtHely, kpopVetitesId);
 
-            // === Barbie ===
+
             pstmtFilm.setString(1, "Barbie");
             pstmtFilm.setString(2, "A Barbie 2023-ban bemutatott amerikai fantasy filmvígjáték.");
             pstmtFilm.setString(3, "https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg");
@@ -266,10 +259,8 @@ public class DatabaseManager {
         try {
             conn.setAutoCommit(false);
 
-            // 1. Felhasználó kezelése
             int felhasznaloId = getOrCreateUser(conn, customerName, customerEmail);
 
-            // 2. Foglalás mentése
             try (PreparedStatement pstmtBooking = conn.prepareStatement(insertBookingSql)) {
                 String seatsStr = selectedSeats.stream().map(Seat::getSeatId).collect(Collectors.joining(", "));
                 pstmtBooking.setInt(1, vetitesId);
@@ -280,7 +271,6 @@ public class DatabaseManager {
                 pstmtBooking.executeUpdate();
             }
 
-            // 3. Helyek frissítése
             try (PreparedStatement pstmtUpdateSeats = conn.prepareStatement(updateSeatsSql)) {
                 for (Seat seat : selectedSeats) {
                     pstmtUpdateSeats.setInt(1, vetitesId);
@@ -324,7 +314,7 @@ public class DatabaseManager {
             int filmId;
             int vetitesId;
 
-            // FONTOS: Statement.RETURN_GENERATED_KEYS H2-höz
+
             try (PreparedStatement pstmtFilm = conn.prepareStatement(insertFilmSql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmtFilm.setString(1, title);
                 pstmtFilm.setString(2, description);
@@ -405,7 +395,7 @@ public class DatabaseManager {
         }
 
         String insertSql = "INSERT INTO Felhasznalok(nev, email) VALUES(?, ?)";
-        // FONTOS: RETURN_GENERATED_KEYS H2-höz
+
         try (PreparedStatement pstmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, name);
             pstmt.setString(2, email);
@@ -424,8 +414,7 @@ public class DatabaseManager {
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
 
-            // Ez a parancs utasítja a H2-t, hogy azonnal mentsen el mindent,
-            // zárja be a kapcsolatokat és törölje a .lock fájlt.
+
             stmt.execute("SHUTDOWN");
             System.out.println("Adatbázis szabályosan leállítva.");
 
